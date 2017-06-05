@@ -15,8 +15,11 @@ baseUrl = "https://data.seattle.gov/resource/pu5n-trf4.json"
 
 url = "https://data.seattle.gov/resource/pu5n-trf4.json?$where=at_scene_time%20between%20'2017-05-15T20:00:00'%20and%20'2017-05-24T23:00:00'&initial_type_group=ROAD%20RAGE"
 
-#$where=longitude < -122.325458
-#$where=longitude > -122.293172
+#$where=longitude > -122.325458
+#$where=longitude < -122.293172
+#$where=latitude < 47.623644
+#$where=latitude > 47.606359
+
 
 
 print (time.strftime("%Y-%m-%dT%H:%M:%S"))
