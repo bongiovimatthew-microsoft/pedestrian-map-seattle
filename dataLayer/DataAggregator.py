@@ -19,7 +19,7 @@ class DataAggregator():
         # TODO: need to figure out how to combine all GEOJson 'features'
         
         #{
-        #"type": "FeatureCollection",                                                                        
+        #"type": "FeatureCollection",
         #"features": [
         #{ "type": "Feature", "properties": { "Primary ID": "1.26", "Secondary ID": "7km NE of Lake Arrowhead, California" }, "geometry": { "type": "Point", "coordinates": [ -117.1413333, 34.297 ] } },
         #{ "type": "Feature", "properties": { "Primary ID": "1.87", "Secondary ID": "13km NNE of Pahala, Hawaii" }, "geometry": { "type": "Point", "coordinates": [ -155.434494, 19.3199997 ] } },
