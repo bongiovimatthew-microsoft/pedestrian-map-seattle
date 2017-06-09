@@ -1,0 +1,13 @@
+Matt:
+	Seattle911Cleaner - Finish adding all data features, add weights, clean out non-essential JSON data
+	SeattleAccessibilityCleaner - Copy Seattle911Cleaner, but adjust to use accessibility datasets
+	Route Calculation with Mapbox/Turf approach 
+
+Manish: 
+	DataAggregator - Aggregate data from each cleaner, add weights, handle non-responsive cleaner?
+	Orchestrator App - Make basic python web app, 
+	Route Calculation with Bing "near route" approach
+
+
+
+Front-End application -- James/Matt split 
