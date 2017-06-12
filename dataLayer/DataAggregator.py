@@ -49,7 +49,9 @@ class DataAggregator():
                 point['weight'] *= cleaner[2]
 
                 # Scale point weight by weight of knob for this call
-                point['weight'] *= knobWeights[cleaner[1]]
+                # issue-manigu-06112017 what should we do in the case that we dont have this passed to us?
+                if cleaner[1] not in knobWeights.keys():
+                    point['weight'] *= knobWeights[cleaner[1]]
 
         allGeoJson.append(cleanerData)
 
