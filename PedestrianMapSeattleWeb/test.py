@@ -2,11 +2,6 @@ import json
 import urllib.request
 import urllib.parse
 
-import sys
-sys.path.insert(0, '..\datalayer')
-print(sys.path)
-from DataAggregator import DataAggregator
-
 fullUrl = "http://127.0.0.1:8000/routeCalc/"
 knobWeights = {
            "Safety" : 1
