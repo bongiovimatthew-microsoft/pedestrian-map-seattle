@@ -10,8 +10,9 @@ sys.path.insert(0, '..\datalayer')
 from DataAggregator import DataAggregator
 
 
-# issue-manish-06112017 remove csrf exempt
-# issue-manish-06112017 using post for now, might want to make this a get?
+# issue-manigu-06112017 remove csrf exempt
+# issue-manigu-06112017 using post for now, might want to make this a get?
+# todo-manigu-06122017 validate all points are in the request
 # Create your views here.
 @csrf_exempt
 def index(request):
