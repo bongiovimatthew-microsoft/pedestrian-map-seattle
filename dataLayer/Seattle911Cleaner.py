@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from ICleaner import ICleaner
 from HttpRequestManager import HttpRequestManager
+from JsonCleaner import JsonCleaner
 
 class Seattle911Cleaner(ICleaner):  
 
@@ -47,20 +48,8 @@ class Seattle911Cleaner(ICleaner):
         # TODO: Handle JSON parsing exceptions  
         # TODO: Adjust score to not be even across all 911 Call types 
         
-        for response in responses:
-            responseObj = json.loads(response)
-            for feature in responseObj['features']: 
-                score = 1
-                responseSchemaTemplate = "{\"type\": \"Feature\", \"geometry\": {}, \"properties\": { \"latitude\": {}, \"longitude\": {}, \"score\": {} }}"
-                cleanFeature = json.loads(responseSchemaTemplate)
-                
-                cleanFeature['geometry'] = feature['geometry']
-                cleanFeature['properties']['latitude'] = feature['properties']['latitude']
-                cleanFeature['properties']['longitude'] = feature['properties']['longitude']
-                cleanFeature['properties']['score'] = str(score)
-                responseGeoJson['features'].append(cleanFeature)
-
-        return responseGeoJson
+        cleaner = JsonCleaner()
+        return cleaner.CleanGeoJson(responses, responseGeoJson)
         
         
     def QueryBackend(self, addedFilters):
