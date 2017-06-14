@@ -30,24 +30,40 @@ class SeattleAccessibilityCleaner(ICleaner):
         
         # TODO: Decide if cleaners should choose date range, or if we should use the date range passed in 
         
-        whereClause = "within_box(Share, {0}, {1}, {2}, {3})".format(str(boundingBox[0][0]), str(boundingBox[0][1]), str(boundingBox[1][0]), str(boundingBox[1][1]))
+        whereClause = "within_box(shape, {0}, {1}, {2}, {3})".format(str(boundingBox[0][0]), str(boundingBox[0][1]), str(boundingBox[1][0]), str(boundingBox[1][1]))
         allFilters = []
-        allFilters.append({ "CATEGORY": "SINGLE", "$where": whereClause })
-        allFilters.append({ "CATEGORY": "SHARED", "$where": whereClause })        
+        allFilters.append({ "category": "SINGLE", "$where": whereClause })
+        allFilters.append({ "category": "SHARED", "$where": whereClause })
         
         for filter in allFilters:
             responses.append(self.QueryBackend(filter))
 
         # TODO: Handle JSON parsing exceptions  
-        # TODO: Adjust score to not be even across all 911 Call types 
-        
-        cleaner = JsonCleaner()
-        return cleaner.CleanGeoJson(responses, responseGeoJson)
+        # TODO: Move JSON handling out to JsonCleaner
+        for res in responses:
+            responseObj = json.loads(res)
+            for obj in responseObj:
+                score = 1
+                if(obj['condition'] == "POOR"):
+                    score = 0.7
+                
+                responseSchemaTemplate = "{\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": []}, \"properties\": { \"latitude\": {}, \"longitude\": {}, \"score\": {} }}"
+                cleanFeature = json.loads(responseSchemaTemplate)
+                    
+                cleanFeature['geometry']['coordinates'].append(obj['shape']['longitude'])
+                cleanFeature['geometry']['coordinates'].append(obj['shape']['latitude'])
+                cleanFeature['properties']['latitude'] = obj['shape']['latitude']
+                cleanFeature['properties']['longitude'] = obj['shape']['longitude']
+                cleanFeature['properties']['score'] = str(score)
+                
+                responseGeoJson['features'].append(cleanFeature)
+
+        return responseGeoJson
         
         
     def QueryBackend(self, addedFilters):
                 
-        manager = HttpRequestManager("https://data.seattle.gov/resource/j3nx-ir4y.geojson")
+        manager = HttpRequestManager("https://data.seattle.gov/resource/j3nx-ir4y.json")
         
         filters = addedFilters
         
