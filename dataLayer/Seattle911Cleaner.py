@@ -66,5 +66,5 @@ class Seattle911Cleaner(ICleaner):
         addedHeaders = { "X-App-Token": "88CbAdhF0j6N1usyYmBDdtCMI" }
         addedHeaders = {}
         response = manager.post( addedQsParams = filters, addedHeaders = addedHeaders)
-        
+
         return response
