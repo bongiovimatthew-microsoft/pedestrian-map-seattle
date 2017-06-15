@@ -29,3 +29,37 @@ map.on('load', function() {
             }
         });
 });
+
+
+// Define the points to be analyzed 
+var points = %%data_blob%%
+
+// Generate a TIN, using the "score" property as the Z value for the points 
+var tin = turf.tin(points, 'score')
+
+// Iterate through the TIN polygons, and calculate area and centroid for each 
+for(i = 0; i < tin.features.length; i++){
+    tin.features[i].properties.area = turf.area(tin.features[i])
+    tin.features[i].properties.centroid = turf.centroid(tin.features[i])
+}
+
+// Define a compare function to compare TIN polygons by area, from largest to smallest 
+function compare(a,b) {
+  if (a.properties.area < b.properties.area)
+    return 1;
+  if (a.properties.area > b.properties.area)
+    return -1;
+  return 0;
+}
+
+// Sort the TIN by polygon area, from largest to smallest 
+var sortedTin = tin.features.sort(compare); 
+
+// Take the top 10 centroids and use them as waypoints 
+var waypoints = []
+for(i = 0; i < 20; i++){
+    currCentroid = sortedTin[i].properties.centroid.geometry.coordinates
+    waypoints.push(currCentroid)
+}
+
+console.log(waypoints)
