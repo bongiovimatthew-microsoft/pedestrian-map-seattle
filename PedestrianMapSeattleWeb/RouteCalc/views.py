@@ -25,7 +25,7 @@ def index(request):
 
     aggregator = DataAggregator()
 
-    requestDict = json.loads(request.body)
+    requestDict = json.loads(str(request.body.decode('utf-8')))
     print(requestDict)
 
     dateRange = ""
