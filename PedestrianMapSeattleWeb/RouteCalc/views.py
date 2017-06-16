@@ -32,6 +32,8 @@ def index(request):
     boundingBox = ((requestDict['startLatitude'], requestDict['startLongitude']), (requestDict['endLatitude'], requestDict['endLongitude']))
     knobWeights = requestDict['knobWeights']
 
-    aggregator.GetAllCleanData(dateRange, boundingBox, knobWeights)
+    allData = aggregator.GetAllCleanData(dateRange, boundingBox, knobWeights)
+    
+    print(allData)
 
     return HttpResponse("Got RouteCalc Request!")
