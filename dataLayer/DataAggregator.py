@@ -1,5 +1,8 @@
 from ICleaner import ICleaner
 from Seattle911Cleaner import Seattle911Cleaner
+from SeattleAccessibilityCleaner import SeattleAccessibilityCleaner
+from SeattleNatureCleaner import SeattleNatureCleaner
+from SeattlePublicToiletsCleaner import SeattlePublicToiletsCleaner
 
 class DataAggregator():
 
@@ -10,7 +13,9 @@ class DataAggregator():
         #  2 is the weight of that set wrt to the knob, bounding box for data set?
         self.allCleaners = [
         ('Seattle911Cleaner', 'Safety', 1),
-        # ('SeattleAccessibilityCleaner', 'Accessibility', 1)
+        ('SeattleAccessibilityCleaner', 'Accessibility', 1),
+        ('SeattleNatureCleaner', 'Nature', 1),
+        ('SeattlePublicToiletsCleaner', 'Toilets', 1)
         ]
         return
     
@@ -27,33 +32,24 @@ class DataAggregator():
 
         # TODO-manigu-06112017 figure out data cleaners from the bounding box
 
-
-        # TODO: need to figure out how to combine all GEOJson 'features'
-        
-        #{
-        #"type": "FeatureCollection",
-        #"features": [
-        #{ "type": "Feature", "properties": { "Primary ID": "1.26", "Secondary ID": "7km NE of Lake Arrowhead, California" }, "geometry": { "type": "Point", "coordinates": [ -117.1413333, 34.297 ] } },
-        #{ "type": "Feature", "properties": { "Primary ID": "1.87", "Secondary ID": "13km NNE of Pahala, Hawaii" }, "geometry": { "type": "Point", "coordinates": [ -155.434494, 19.3199997 ] } },
-        # weight?
+        # TODO: Call each cleaner in a separate thread 
         for cleaner in self.allCleaners:
             cleanerName = eval(cleaner[0])()
             cleanerData = cleanerName.GetData(dateRange, boundingBox)
             cleanerPoints = cleanerData["features"]
             for point in cleanerPoints:
                 # Default to a 1 if weight is not in the point
-                if "weight" not in point.keys():
-                    point['weight'] = 1
+                if "score" not in point.keys():
+                    point['score'] = 1
 
                 # Scale point weight by weight of data wrt to a knob
-                point['weight'] *= cleaner[2]
+                point['score'] *= cleaner[2]
 
                 # Scale point weight by weight of knob for this call
                 # issue-manigu-06112017 what should we do in the case that we dont have this passed to us?
                 if cleaner[1] not in knobWeights.keys():
-                    point['weight'] *= knobWeights[cleaner[1]]
+                    point['score'] *= knobWeights[cleaner[1]]
 
         allGeoJson.append(cleanerData)
 
-        print(allGeoJson)
         return allGeoJson
