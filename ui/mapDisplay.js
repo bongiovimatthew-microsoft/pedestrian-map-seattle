@@ -30,7 +30,7 @@ var sendRequestFunction = function() {
     var http = new XMLHttpRequest();
     var url = "http://127.0.0.1:8000/routeCalc/";
     var knobs = { "Accessibility": 0.5, "Safety": 1, "Nature": 0.2, "Toilets": 0.1 }
-    var params = {"startLatitude" : startPoint[0], "startLongitude": startPoint[1], "endLatitude": endPoint[0], "endLongitude": endPoint[1], "knobWeights": knobs}
+    var params = {"startLatitude" : startPoint[1], "startLongitude": startPoint[0], "endLatitude": endPoint[1], "endLongitude": endPoint[0], "knobWeights": knobs}
     
     console.log(params)
     console.log(JSON.stringify(params))
