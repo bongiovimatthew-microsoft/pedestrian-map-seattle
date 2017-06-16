@@ -25,6 +25,13 @@ def index(request):
 
     aggregator = DataAggregator()
 
+    
+    requestBodyString = str(request.body.decode('utf-8'))
+    print(requestBodyString)
+    if not requestBodyString: 
+        print("Empty request")
+        return HttpResponse("Empty request")
+        
     requestDict = json.loads(str(request.body.decode('utf-8')))
     print(requestDict)
 
