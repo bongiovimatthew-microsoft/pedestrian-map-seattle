@@ -9,9 +9,6 @@ import sys
 sys.path.insert(0, '..\datalayer')
 from DataAggregator import DataAggregator
 
-#sys.path.insert(0, '..\calculationLayer')
-#from waypointJsGenerator import WaypointGenerator
-
 
 # issue-manigu-06112017 remove csrf exempt
 # issue-manigu-06112017 using post for now, might want to make this a get?
@@ -47,12 +44,8 @@ def index(request):
     print(allData)
     
     # Write data to json file 
-    file = open(“aggregateData.json”,”w”) 
-    file.write(allData)
-    file.close() 
-
-    # Generate Waypoint Calculator JS from new data 
-    #waypointJs = WaypointGenerator()
-    #waypointJs.GenerateWaypointJS("aggregationData.json", "waypointCalc_agg.js")
+    #file = open(“aggregateData.json”,”w”) 
+    #file.write(allData)
+    #file.close() 
     
     return HttpResponse("Got RouteCalc Request!")
