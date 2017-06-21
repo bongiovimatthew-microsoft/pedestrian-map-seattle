@@ -28,7 +28,7 @@ class DataAggregator():
     # Returns: 
     #    GeoJSON blob containing all data, weighted appropriately 
     def GetAllCleanData(self, dateRange, boundingBox, knobWeights): 
-        allGeoJson = []
+        allGeoJson = {'type': 'FeatureCollection', 'features': []}
 
         # TODO-manigu-06112017 figure out data cleaners from the bounding box
 
@@ -39,17 +39,17 @@ class DataAggregator():
             cleanerPoints = cleanerData["features"]
             for point in cleanerPoints:
                 # Default to a 1 if weight is not in the point
-                if "score" not in point.keys():
-                    point['score'] = 1
+                if "score" not in point['properties'].keys():
+                    point['properties']['score'] = 1
 
                 # Scale point weight by weight of data wrt to a knob
-                point['score'] *= cleaner[2]
+                point['properties']['score'] = float(point['properties']['score']) * cleaner[2]
 
                 # Scale point weight by weight of knob for this call
                 # issue-manigu-06112017 what should we do in the case that we dont have this passed to us?
-                if cleaner[1] not in knobWeights.keys():
-                    point['score'] *= knobWeights[cleaner[1]]
+                if cleaner[1] in knobWeights.keys():
+                    point['properties']['score'] *= knobWeights[cleaner[1]]
 
-        allGeoJson.append(cleanerData)
+            allGeoJson['features'] = allGeoJson['features'] + cleanerPoints
 
         return allGeoJson
