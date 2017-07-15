@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from pprint import pprint as pp
 import json
@@ -15,7 +15,7 @@ from DataAggregator import DataAggregator
 # todo-manigu-06122017 validate all points are in the request
 # Create your views here.
 @csrf_exempt
-def index(request):
+def RouteCalcCore(request):
     print("request.Method: " + request.method)
     if request.method == "GET":
         return HttpResponse("Use a post request!")
@@ -40,12 +40,11 @@ def index(request):
     knobWeights = requestDict['knobWeights']
 
     allData = aggregator.GetAllCleanData(dateRange, boundingBox, knobWeights)
-    
     print(allData)
-    
+
     # Write data to json file 
     #file = open(“aggregateData.json”,”w”) 
     #file.write(allData)
     #file.close() 
     
-    return HttpResponse("Got RouteCalc Request!")
+    return JsonResponse(allData)
