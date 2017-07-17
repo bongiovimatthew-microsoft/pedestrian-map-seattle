@@ -3,6 +3,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from pprint import pprint as pp
 import json
+import urllib.request
+import urllib.parse
 
 # issue-manish-06112017 there's prolly a better way to do this 
 import sys
@@ -42,9 +44,14 @@ def RouteCalcCore(request):
     allData = aggregator.GetAllCleanData(dateRange, boundingBox, knobWeights)
     print(allData)
 
-    # Write data to json file 
-    #file = open(“aggregateData.json”,”w”) 
-    #file.write(allData)
-    #file.close() 
+    # Make request to node.js endpoint 
+    fullUrl = "http://127.0.0.1:8080?data="
+    safe = '$\':'
+    fullUrl += urllib.parse.quote(allData, safe = safe)
+
+    req = urllib.request.Request(fullUrl)
+    response = urllib.request.urlopen(req, timeout = 10)
+    responseStr = (response.read().decode('utf8'))
+    print(responseStr)
     
     return JsonResponse(allData)
