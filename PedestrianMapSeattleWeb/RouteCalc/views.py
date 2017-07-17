@@ -48,10 +48,31 @@ def RouteCalcCore(request):
     fullUrl = "http://127.0.0.1:8080?data="
     safe = '$\':'
     fullUrl += urllib.parse.quote(allData, safe = safe)
-
     req = urllib.request.Request(fullUrl)
     response = urllib.request.urlopen(req, timeout = 10)
     responseStr = (response.read().decode('utf8'))
     print(responseStr)
+    
+    
+    # Make the request to the bing directions endpoint using
+    #  the waypoints calculated in the previous step 
+    
+    bingReq = "http://dev.virtualearth.net/REST/V1/Routes/Walking?optmz=distance&output=json" 
+
+    # Specifying a waypoint as a Point 
+    # The coordinates are double values that are separated by commas and are specified in the following order.
+    # Latitude,Longitude
+    # Use the following ranges of values:
+    # Latitude (degrees): [-90, +90]
+    # Longitude (degrees): [-180,+180]
+    # Example: 47.610679194331169, -122.10788659751415
+    i = 0
+    for waypointObj in json.loads(responseStr):
+        long = waypointObj['coordinates'][1]
+        lat = waypointObj['coordinates'][0]
+        bingReq += "&wp." + str(i) + "=" + str(lat) + "%2C" + str(long)
+        i++
+
+    bingReq += "&key=AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf"
     
     return JsonResponse(allData)
