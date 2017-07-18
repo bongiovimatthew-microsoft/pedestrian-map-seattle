@@ -38,8 +38,14 @@ class DataAggregator():
             cleanerData = cleanerName.GetData(dateRange, boundingBox)
             cleanerPoints = cleanerData["features"]
             for point in cleanerPoints:
+                # Ensure that all coordinates are floats (and not strings)
+                tempCoords = []
+                for coordinate in point['geometry']['coordinates']:
+                    tempCoords.append(float(coordinate))
+                point['geometry']['coordinates'] = tempCoords
+                
                 # Default to a 1 if weight is not in the point
-                if "score" not in point['properties'].keys():
+                if 'score' not in point['properties'].keys():
                     point['properties']['score'] = 1
 
                 # Scale point weight by weight of data wrt to a knob

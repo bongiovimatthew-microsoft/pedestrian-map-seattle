@@ -27,32 +27,27 @@ def RouteCalcCore(request):
 
     aggregator = DataAggregator()
 
-    
     requestBodyString = str(request.body.decode('utf-8'))
-    print(requestBodyString)
     if not requestBodyString: 
         print("Empty request")
         return HttpResponse("Empty request")
         
     requestDict = json.loads(str(request.body.decode('utf-8')))
-    print(requestDict)
-
+    
     dateRange = ""
     boundingBox = ((requestDict['startLatitude'], requestDict['startLongitude']), (requestDict['endLatitude'], requestDict['endLongitude']))
     knobWeights = requestDict['knobWeights']
 
     allData = aggregator.GetAllCleanData(dateRange, boundingBox, knobWeights)
-    print(allData)
-
+    
     # Make request to node.js endpoint 
     fullUrl = "http://127.0.0.1:8080?data="
     safe = '$\':'
-    fullUrl += urllib.parse.quote(allData, safe = safe)
+    fullUrl += urllib.parse.quote(str(allData), safe = safe)
     req = urllib.request.Request(fullUrl)
     response = urllib.request.urlopen(req, timeout = 10)
     responseStr = (response.read().decode('utf8'))
     print(responseStr)
-    
     
     # Make the request to the bing directions endpoint using
     #  the waypoints calculated in the previous step 
@@ -68,11 +63,17 @@ def RouteCalcCore(request):
     # Example: 47.610679194331169, -122.10788659751415
     i = 0
     for waypointObj in json.loads(responseStr):
-        long = waypointObj['coordinates'][1]
-        lat = waypointObj['coordinates'][0]
-        bingReq += "&wp." + str(i) + "=" + str(lat) + "%2C" + str(long)
-        i++
+        long = waypointObj['geometry']['coordinates'][0]
+        lat = waypointObj['geometry']['coordinates'][1]
+        bingReq += "&wp." + str(i) + "=" + str(lat) + "," + str(long)
+        i+= 1
 
     bingReq += "&key=AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf"
+    
+    req = urllib.request.Request(bingReq)
+    response = urllib.request.urlopen(req, timeout = 10)
+    responseStr = response.read() 
+    
+    print(str(responseStr))
     
     return JsonResponse(allData)

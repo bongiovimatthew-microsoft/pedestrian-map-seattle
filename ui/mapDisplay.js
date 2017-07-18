@@ -45,6 +45,7 @@ var sendRequestFunction = function() {
             console.log(http.responseText);
         }
     }
+    console.log(JSON.stringify(params));
     http.send(JSON.stringify(params));
 }
 
