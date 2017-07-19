@@ -1,0 +1,764 @@
+{
+	"authenticationResultCode" : "ValidCredentials",
+	"brandLogoUri" : "http:\\/\\/dev.virtualearth.net\\/Branding\\/logo_powered_by.png",
+	"copyright" : "Copyright \xc2\xa9 2017 Microsoft and its suppliers. All rights reserved. This API cannot be accessed and the content and any results may not be used, reproduced or transmitted in any manner without express written permission from Microsoft Corporation.",
+	"resourceSets" : [{
+			"estimatedTotal" : 1,
+			"resources" : [{
+					"__type" : "Route:http:\\/\\/schemas.microsoft.com\\/search\\/local\\/ws\\/rest\\/v1",
+					"bbox" : [47.61515, -122.322133, 47.615734, -122.310157],
+					"id" : "v69,h-1778384850,i0,a0,cen-US,dAAAAAAAAAAA1,y0,s1,m2,o2,t0,wgpyxCNDOR0DQkjmXbJRewA2~AoeaOLkzmTEBAADgAVmF1T4C0~cGF0aA2~~~~v10,wgpyxCNDOR0AzpaW6PJRewA2~AoeaOLkDnDEBAADgAcG-yD4C0~MTJ0aCBBdmU1~~~~v10,wgpyxCNDOR0BugM1znJRewA2~AoeaOLkTBTEBAADgASrZjj4A0~SGFydmFyZCBBdmU1~~~~v10,wgpyxCNDOR0D6yX0B3ZNewA2~AoeaOLnhhzEBAADgAc8eBj4B0~MTd0aCBBdmU1~~~~v10,wgpyxCNDOR0CWtxHeDJRewA2~AoeaOLmhVjEBAADgAUClvj4B0~MTV0aCBBdmU1~~~~v10,k1",
+					"distanceUnit" : "Kilometer",
+					"durationUnit" : "Second",
+					"routeLegs" : [{
+							"actualEnd" : {
+								"type" : "Point",
+								"coordinates" : [47.615713, -122.316858]
+							},
+							"actualStart" : {
+								"type" : "Point",
+								"coordinates" : [47.615734, -122.319712]
+							},
+							"alternateVias" : [],
+							"cost" : 0,
+							"description" : "E Pine St, 12th Ave",
+							"itineraryItems" : [{
+									"compassDirection" : "south",
+									"details" : [{
+											"compassDegrees" : 180,
+											"endPathIndices" : [1],
+											"maneuverType" : "DepartStart",
+											"mode" : "Walking",
+											"roadType" : "WalkingPath",
+											"startPathIndices" : [0]
+										}
+									],
+									"exit" : "",
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "DepartStart",
+										"text" : "Depart toward E Pine St"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615734, -122.319712]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"towardsRoadName" : "E Pine St",
+									"transitTerminus" : "",
+									"travelDistance" : 0.053,
+									"travelDuration" : 38,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "east",
+									"details" : [{
+											"compassDegrees" : 90,
+											"endPathIndices" : [5],
+											"locationCodes" : ["114+11103"],
+											"maneuverType" : "TurnLeft",
+											"mode" : "Walking",
+											"names" : ["E Pine St"],
+											"roadType" : "Street",
+											"startPathIndices" : [1]
+										}
+									],
+									"exit" : "",
+									"hints" : [{
+											"hintType" : "Landmark",
+											"text" : "KFC on the corner"
+										}
+									],
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "TurnLeft",
+										"text" : "Turn left onto E Pine St"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.61525, -122.31972]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0.216,
+									"travelDuration" : 155,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "north",
+									"details" : [{
+											"compassDegrees" : 359,
+											"endPathIndices" : [6],
+											"maneuverType" : "TurnLeft",
+											"mode" : "Walking",
+											"names" : ["12th Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [5]
+										}
+									],
+									"exit" : "",
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "TurnLeft",
+										"text" : "Turn left onto 12th Ave"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.61525, -122.31685]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0.051,
+									"travelDuration" : 36,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "north",
+									"details" : [{
+											"compassDegrees" : 359,
+											"endPathIndices" : [6],
+											"maneuverType" : "ArriveFinish",
+											"mode" : "Walking",
+											"names" : ["12th Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [6]
+										}
+									],
+									"exit" : "",
+									"hints" : [{
+											"hintType" : "PreviousIntersection",
+											"text" : "The last intersection is E Pine St"
+										}, {
+											"hintType" : "NextIntersection",
+											"text" : "If you reach E Olive St, you\'ve gone too far"
+										}
+									],
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "ArriveIntermediateStop",
+										"text" : "Arrive at 12th Ave on the right"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615713, -122.316858]
+									},
+									"sideOfStreet" : "Right",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0,
+									"travelDuration" : 0,
+									"travelMode" : "Walking"
+								}
+							],
+							"routeRegion" : "NAv2",
+							"routeSubLegs" : [{
+									"endWaypoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615713, -122.316858],
+										"description" : "12th Ave",
+										"isVia" : false,
+										"locationIdentifier" : "2|135|154|56|185|3|156|49|1|0|0|224|1|193|190|200|62|2|47.615713,-122.316858",
+										"routePathIndex" : 6
+									},
+									"startWaypoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615734, -122.319712],
+										"description" : "path",
+										"isVia" : false,
+										"locationIdentifier" : "2|135|154|56|185|51|153|49|1|0|0|224|1|89|133|213|62|2|47.615734,-122.319712",
+										"routePathIndex" : 0
+									},
+									"travelDistance" : 0.32,
+									"travelDuration" : 231
+								}
+							],
+							"travelDistance" : 0.32,
+							"travelDuration" : 231
+						}, {
+							"actualEnd" : {
+								"type" : "Point",
+								"coordinates" : [47.615722, -122.322133]
+							},
+							"actualStart" : {
+								"type" : "Point",
+								"coordinates" : [47.615713, -122.316858]
+							},
+							"alternateVias" : [],
+							"cost" : 0,
+							"description" : "12th Ave, E Pine St",
+							"itineraryItems" : [{
+									"compassDirection" : "south",
+									"details" : [{
+											"compassDegrees" : 179,
+											"endPathIndices" : [1],
+											"maneuverType" : "DepartStart",
+											"mode" : "Walking",
+											"names" : ["12th Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [0]
+										}
+									],
+									"exit" : "",
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "DepartIntermediateStop",
+										"text" : "Depart 12th Ave toward E Pine St"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615713, -122.316858]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"towardsRoadName" : "E Pine St",
+									"transitTerminus" : "",
+									"travelDistance" : 0.051,
+									"travelDuration" : 36,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "west",
+									"details" : [{
+											"compassDegrees" : 270,
+											"endPathIndices" : [3],
+											"locationCodes" : ["114-11102"],
+											"maneuverType" : "TurnRight",
+											"mode" : "Walking",
+											"names" : ["E Pine St"],
+											"roadType" : "Street",
+											"startPathIndices" : [1]
+										}
+									],
+									"exit" : "",
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "TurnRight",
+										"text" : "Turn right onto E Pine St"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.61525, -122.31685]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0.397,
+									"travelDuration" : 285,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "north",
+									"details" : [{
+											"endPathIndices" : [5],
+											"maneuverType" : "TurnRight",
+											"mode" : "Walking",
+											"names" : ["Harvard Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [3]
+										}
+									],
+									"exit" : "",
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "TurnRight",
+										"text" : "Turn right onto Harvard Ave"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.61523, -122.32213]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0.054,
+									"travelDuration" : 39,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "north",
+									"details" : [{
+											"compassDegrees" : 358,
+											"endPathIndices" : [5],
+											"maneuverType" : "ArriveFinish",
+											"mode" : "Walking",
+											"names" : ["Harvard Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [5]
+										}
+									],
+									"exit" : "",
+									"hints" : [{
+											"hintType" : "PreviousIntersection",
+											"text" : "The last intersection is E Pine St"
+										}, {
+											"hintType" : "NextIntersection",
+											"text" : "If you reach E Olive St, you\'ve gone too far"
+										}
+									],
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "ArriveIntermediateStop",
+										"text" : "Arrive at Harvard Ave"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615722, -122.322133]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0,
+									"travelDuration" : 0,
+									"travelMode" : "Walking"
+								}
+							],
+							"routeRegion" : "NAv2",
+							"routeSubLegs" : [{
+									"endWaypoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615722, -122.322133],
+										"description" : "Harvard Ave",
+										"isVia" : false,
+										"locationIdentifier" : "2|135|154|56|185|19|5|49|1|0|0|224|1|42|217|142|62|0|47.615722,-122.322133",
+										"routePathIndex" : 11
+									},
+									"startWaypoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615713, -122.316858],
+										"description" : "12th Ave",
+										"isVia" : false,
+										"locationIdentifier" : "2|135|154|56|185|3|156|49|1|0|0|224|1|193|190|200|62|2|47.615713,-122.316858",
+										"routePathIndex" : 6
+									},
+									"travelDistance" : 0.502,
+									"travelDuration" : 361
+								}
+							],
+							"travelDistance" : 0.502,
+							"travelDuration" : 361
+						}, {
+							"actualEnd" : {
+								"type" : "Point",
+								"coordinates" : [47.615719, -122.310157]
+							},
+							"actualStart" : {
+								"type" : "Point",
+								"coordinates" : [47.615722, -122.322133]
+							},
+							"alternateVias" : [],
+							"cost" : 0,
+							"description" : "E Pine St",
+							"itineraryItems" : [{
+									"compassDirection" : "south",
+									"details" : [{
+											"compassDegrees" : 178,
+											"endPathIndices" : [2],
+											"maneuverType" : "DepartStart",
+											"mode" : "Walking",
+											"names" : ["Harvard Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [0]
+										}
+									],
+									"exit" : "",
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "DepartIntermediateStop",
+										"text" : "Depart Harvard Ave toward E Pine St"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615722, -122.322133]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"towardsRoadName" : "E Pine St",
+									"transitTerminus" : "",
+									"travelDistance" : 0.054,
+									"travelDuration" : 39,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "east",
+									"details" : [{
+											"compassDegrees" : 89,
+											"endPathIndices" : [4],
+											"locationCodes" : ["114+11103"],
+											"maneuverType" : "TurnLeft",
+											"mode" : "Walking",
+											"names" : ["E Pine St"],
+											"roadType" : "Street",
+											"startPathIndices" : [2]
+										}
+									],
+									"exit" : "",
+									"hints" : [{
+											"hintType" : "Landmark",
+											"text" : "Pass KFC in 0.2 km"
+										}
+									],
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "TurnLeft",
+										"text" : "Turn left onto E Pine St"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.61523, -122.32213]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0.8,
+									"travelDuration" : 576,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "northeast",
+									"details" : [{
+											"compassDegrees" : 116,
+											"endPathIndices" : [6],
+											"maneuverType" : "BearRight",
+											"mode" : "Walking",
+											"names" : ["16th Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [4]
+										}, {
+											"compassDegrees" : 67,
+											"endPathIndices" : [7],
+											"locationCodes" : ["114+08211"],
+											"maneuverType" : "TurnLeft",
+											"mode" : "Walking",
+											"names" : ["E Madison St"],
+											"roadType" : "MajorRoad",
+											"startPathIndices" : [6]
+										}
+									],
+									"exit" : "",
+									"hints" : [{
+											"hintType" : "Landmark",
+											"text" : "7-Eleven\\/7-Eleven on the corner"
+										}
+									],
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "BearRightThenTurnLeft",
+										"text" : "Bear right onto 16th Ave, and then immediately turn left onto E Madison St"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.61529, -122.31148]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0.119,
+									"travelDuration" : 85,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "north",
+									"details" : [{
+											"compassDegrees" : 1,
+											"endPathIndices" : [8],
+											"maneuverType" : "TurnLeft",
+											"mode" : "Walking",
+											"names" : ["17th Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [7]
+										}
+									],
+									"exit" : "",
+									"hints" : [{
+											"hintType" : "Landmark",
+											"text" : "Shell on the corner"
+										}
+									],
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "TurnLeft",
+										"text" : "Turn left onto 17th Ave"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.61561, -122.31016]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0.012,
+									"travelDuration" : 8,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "north",
+									"details" : [{
+											"compassDegrees" : 1,
+											"endPathIndices" : [8],
+											"maneuverType" : "ArriveFinish",
+											"mode" : "Walking",
+											"names" : ["17th Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [8]
+										}
+									],
+									"exit" : "",
+									"hints" : [{
+											"hintType" : "PreviousIntersection",
+											"text" : "The last intersection is E Madison St"
+										}, {
+											"hintType" : "NextIntersection",
+											"text" : "If you reach E Olive St, you\'ve gone too far"
+										}
+									],
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "ArriveIntermediateStop",
+										"text" : "Arrive at 17th Ave on the left"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615719, -122.310157]
+									},
+									"sideOfStreet" : "Left",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0,
+									"travelDuration" : 0,
+									"travelMode" : "Walking"
+								}
+							],
+							"routeRegion" : "NAv2",
+							"routeSubLegs" : [{
+									"endWaypoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615719, -122.310157],
+										"description" : "17th Ave",
+										"isVia" : false,
+										"locationIdentifier" : "2|135|154|56|185|225|135|49|1|0|0|224|1|207|30|6|62|1|47.615719,-122.310157",
+										"routePathIndex" : 19
+									},
+									"startWaypoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615722, -122.322133],
+										"description" : "Harvard Ave",
+										"isVia" : false,
+										"locationIdentifier" : "2|135|154|56|185|19|5|49|1|0|0|224|1|42|217|142|62|0|47.615722,-122.322133",
+										"routePathIndex" : 11
+									},
+									"travelDistance" : 0.985,
+									"travelDuration" : 709
+								}
+							],
+							"travelDistance" : 0.985,
+							"travelDuration" : 709
+						}, {
+							"actualEnd" : {
+								"type" : "Point",
+								"coordinates" : [47.615719, -122.312776]
+							},
+							"actualStart" : {
+								"type" : "Point",
+								"coordinates" : [47.615719, -122.310157]
+							},
+							"alternateVias" : [],
+							"cost" : 0,
+							"description" : "E Pine St, 15th Ave",
+							"itineraryItems" : [{
+									"compassDirection" : "south",
+									"details" : [{
+											"compassDegrees" : 181,
+											"endPathIndices" : [1],
+											"maneuverType" : "DepartStart",
+											"mode" : "Walking",
+											"names" : ["17th Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [0]
+										}
+									],
+									"exit" : "",
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "DepartIntermediateStop",
+										"text" : "Depart 17th Ave toward E Madison St"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615719, -122.310157]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"towardsRoadName" : "E Madison St",
+									"transitTerminus" : "",
+									"travelDistance" : 0.012,
+									"travelDuration" : 8,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "northwest",
+									"details" : [{
+											"compassDegrees" : 247,
+											"endPathIndices" : [2],
+											"locationCodes" : ["114-08210"],
+											"maneuverType" : "TurnRight",
+											"mode" : "Walking",
+											"names" : ["E Madison St"],
+											"roadType" : "MajorRoad",
+											"startPathIndices" : [1]
+										}, {
+											"compassDegrees" : 303,
+											"endPathIndices" : [4],
+											"maneuverType" : "TurnRight",
+											"mode" : "Walking",
+											"names" : ["16th Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [2]
+										}
+									],
+									"exit" : "",
+									"hints" : [{
+											"hintType" : "Landmark",
+											"text" : "Shell on the corner"
+										}
+									],
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "TurnRightThenTurnRight",
+										"text" : "Turn right onto E Madison St, and then immediately turn right onto 16th Ave"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.61561, -122.31016]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0.119,
+									"travelDuration" : 85,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "north",
+									"details" : [{
+											"compassDegrees" : 279,
+											"endPathIndices" : [6],
+											"locationCodes" : ["114-11102"],
+											"maneuverType" : "BearLeft",
+											"mode" : "Walking",
+											"names" : ["E Pine St"],
+											"roadType" : "Street",
+											"startPathIndices" : [4]
+										}, {
+											"endPathIndices" : [7],
+											"maneuverType" : "TurnRight",
+											"mode" : "Walking",
+											"names" : ["15th Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [6]
+										}
+									],
+									"exit" : "",
+									"hints" : [{
+											"hintType" : "Landmark",
+											"text" : "7-Eleven\\/7-Eleven on the corner"
+										}
+									],
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "BearLeftThenTurnRight",
+										"text" : "Bear left onto E Pine St, and then immediately turn right onto 15th Ave"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.61529, -122.31148]
+									},
+									"sideOfStreet" : "Unknown",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0.146,
+									"travelDuration" : 105,
+									"travelMode" : "Walking"
+								}, {
+									"compassDirection" : "north",
+									"details" : [{
+											"endPathIndices" : [7],
+											"maneuverType" : "ArriveFinish",
+											"mode" : "Walking",
+											"names" : ["15th Ave"],
+											"roadType" : "Street",
+											"startPathIndices" : [7]
+										}
+									],
+									"exit" : "",
+									"hints" : [{
+											"hintType" : "PreviousIntersection",
+											"text" : "The last intersection is E Pine St"
+										}, {
+											"hintType" : "NextIntersection",
+											"text" : "If you reach E Olive St, you\'ve gone too far"
+										}
+									],
+									"iconType" : "Walk",
+									"instruction" : {
+										"formattedText" : null,
+										"maneuverType" : "ArriveFinish",
+										"text" : "Arrive at 15th Ave onthe left"
+									},
+									"maneuverPoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615719, -122.312776]
+									},
+									"sideOfStreet" : "Left",
+									"tollZone" : "",
+									"transitTerminus" : "",
+									"travelDistance" : 0,
+									"travelDuration" : 0,
+									"travelMode" : "Walking"
+								}
+							],
+							"routeRegion" : "NAv2",
+							"routeSubLegs" : [{
+									"endWaypoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615719, -122.312776],
+										"description" : "15th Ave",
+										"isVia" : false,
+										"locationIdentifier" : "2|135|154|56|185|161|86|49|1|0|0|224|1|64|165|190|62|1|47.615719,-122.312776",
+										"routePathIndex" : 26
+									},
+									"startWaypoint" : {
+										"type" : "Point",
+										"coordinates" : [47.615719, -122.310157],
+										"description" : "17th Ave",
+										"isVia" : false,
+										"locationIdentifier" : "2|135|154|56|185|225|135|49|1|0|0|224|1|207|30|6|62|1|47.615719,-122.310157",
+										"routePathIndex" : 19
+									},
+									"travelDistance" : 0.277,
+									"travelDuration" : 200
+								}
+							],
+							"travelDistance" : 0.277,
+							"travelDuration" : 200
+						}
+					],
+					"trafficCongestion" : "None",
+					"trafficDataUsed" : "None",
+					"travelDistance" : 2.084,
+					"travelDuration" : 1501,
+					"travelDurationTraffic" : 1501
+				}
+			]
+		}
+	],
+	"statusCode" : 200,
+	"statusDescription" : "OK",
+	"traceId" : "acf41882b7b04972802acf4f78c40776|CO30276301|7.7.0.0|CO40091213, CO40090234, CO40080405, CO40080712, CO40080121"
+}
