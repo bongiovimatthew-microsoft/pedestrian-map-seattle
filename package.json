@@ -1,0 +1,22 @@
+{
+  "name": "waypointcalc",
+  "version": "0.1.0",
+  "description": "The waypoint calculation engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bongiovimatthew-microsoft/pedestrian-map-seattle.git"
+  },
+  "author": "Matthew Bongiovi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bongiovimatthew-microsoft/pedestrian-map-seattle/issues"
+  },
+  "homepage": "https://github.com/bongiovimatthew-microsoft/pedestrian-map-seattle#readme",
+  "dependencies": {
+    "express": "^4.15.3"
+  }
+}
