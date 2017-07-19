@@ -1,9 +1,3 @@
-from ICleaner import ICleaner
-from Seattle911Cleaner import Seattle911Cleaner
-from SeattleAccessibilityCleaner import SeattleAccessibilityCleaner
-from SeattleNatureCleaner import SeattleNatureCleaner
-from SeattlePublicToiletsCleaner import SeattlePublicToiletsCleaner
-
 class DataAggregator():
 
     def __init__(self):

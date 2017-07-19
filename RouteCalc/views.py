@@ -8,8 +8,8 @@ import urllib.parse
 
 # issue-manish-06112017 there's prolly a better way to do this 
 import sys
-sys.path.insert(0, '..\DataCleaners')
-from DataAggregator import DataAggregator
+sys.path.insert(0, '..\datacleaners')
+from DataCleaners import DataAggregator
 
 
 # issue-manigu-06112017 remove csrf exempt
