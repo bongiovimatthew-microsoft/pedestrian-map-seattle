@@ -8,15 +8,22 @@ var app = express();
 app.set('port', (process.env.PORT || 5000));
 
 app.get('/', function(request, response) {
-    var queryData = url.parse(request.url, true).query.data;    
-    var parsedData = JSON.parse(queryData.replace(/'/g, '"'));
-    
-    if (parsedData) {
-        // Request contains data
-        CalculateWaypoints(parsedData, response);
-    } else {
+    var queryData = request.query.data;
+    if(queryData){
+        try {
+            var parsedData = JSON.parse(queryData.replace(/'/g, '"'));
+            
+            if (parsedData) {
+                // Request contains data, try to use the data 
+                CalculateWaypoints(parsedData, response);
+            }
+        } catch(e) {
+            console.log("Something went wrong." + e);
+            response.end("Something bad happened on your request. Sorry about that.");
+        }
+    }else{
         response.write("Sorry, no data on the request. Please include QS param 'data=<bla>'");
-    }    
+    }
 
     response.end(); //end the response
 });

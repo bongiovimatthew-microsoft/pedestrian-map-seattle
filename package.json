@@ -18,5 +18,8 @@
   "homepage": "https://github.com/bongiovimatthew-microsoft/pedestrian-map-seattle#readme",
   "dependencies": {
     "express": "^4.15.3"
+  },
+  "engines": {
+    "node": "6.11.1"
   }
 }
