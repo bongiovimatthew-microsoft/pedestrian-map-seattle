@@ -72,6 +72,7 @@ app.listen(app.get('port'), function() {
 });
 
 function CalculateWaypoints(dataPoints, res){
+    console.log("Starting CalculateWaypoints");
     
     var bbox = turf.bbox(dataPoints);
     var units = 'miles';
@@ -95,11 +96,15 @@ function CalculateWaypoints(dataPoints, res){
       }
     };
 
+    console.log("Having bounding box, working on square grid");
+    
     var distance = turf.distance(from, to, units);
     var cellSize = distance / 5 
     //console.log(cellSize)
     var squareGrid = turf.squareGrid(bbox, cellSize, units);
 
+    console.log("Have square grid, working on collect");
+    
     // Collect the 'score' property from each squareGrid cell, and attach it as the 'values' array to each squareGrid cell 
     // "collect" takes every point from 'dataPoints' that is within a givin polygon from 'squareGrid' and adds the 
     //  'score' property of the point to the 'values' array property on each squareGrid polygon
@@ -119,6 +124,8 @@ function CalculateWaypoints(dataPoints, res){
       return 0;
     }
 
+    console.log("Sorting grid objects");
+    
     // Sort the collected set by polygon area, from smallest to largest
     var sortedGrid = collected.features.sort(compare); 
     //console.log(sortedGrid) 
