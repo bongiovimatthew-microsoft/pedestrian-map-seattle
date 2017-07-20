@@ -32,6 +32,7 @@ app.get('/', function(request, response) {
 });
 
 app.post('/', function(request, response) {
+    console.log("Receiving request");
     var postBody = request.body; 
     var proccessedRequest = false;
     
@@ -50,6 +51,7 @@ app.post('/', function(request, response) {
             try {
                 var parsedData = JSON.parse(dataFromPost);
                 if (parsedData) {
+                    console.log("Being waypoint calculation");
                     // Request contains data, try to use the data 
                     CalculateWaypoints(parsedData, response);
                     proccessedRequest = true;
