@@ -51,7 +51,7 @@ def RouteCalcCore(request):
     print(postBody)
     
     req = urllib.request.Request(fullUrl)
-    response = urllib.request.urlopen(req, timeout = 10, data = urlEncodedData)
+    response = urllib.request.urlopen(req, timeout = 60, data = urlEncodedData)
     responseStr = (response.read().decode('utf8'))
     print(responseStr)
     
