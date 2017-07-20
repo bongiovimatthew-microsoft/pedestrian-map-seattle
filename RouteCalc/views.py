@@ -46,13 +46,16 @@ def RouteCalcCore(request):
     fullUrl = "https://waypointcalc.herokuapp.com/" 
     safe = '$\':'
     urlEncodedData = urllib.parse.quote(str(allData), safe = safe).encode('utf8')
-    postBody = { "data": urlEncodedData }        
+    
+    postBody = { "data": allData }
     
     print(postBody)
     
     req = urllib.request.Request(fullUrl)
-    req.add_header('Content-Type', 'application/x-www-form-urlencoded')
-    response = urllib.request.urlopen(req, timeout = 60, data = urlEncodedData)
+    req.add_header('Content-Type', 'application/json')
+    json_data = json.dumps(postBody).encode('utf8')
+    
+    response = urllib.request.urlopen(req, timeout = 60, data = json_data)
     responseStr = (response.read().decode('utf8'))
     print(responseStr)
     
