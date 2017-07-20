@@ -40,13 +40,27 @@ app.post('/', function(request, response) {
     
     if(postBody){
         var dataFromPost = decodeURI(postBody.data).replace(/%2C/g,",").replace(/'/g, '"');
+        console.log("DataFromPost: ");
+        console.log(dataFromPost);
+        
+        var breakOut = 0;
         while(dataFromPost.charAt(0) !== '{')
         {
             dataFromPost = dataFromPost.substr(1); // Remove leading characters before '{' 
+            breakOut++;
+            if(breakOut > 100000){
+                break;
+            }
         }
+        
+        breakOut = 0;
         while(dataFromPost.charAt(dataFromPost.length - 1) !== '}')
         {
             dataFromPost = dataFromPost.substr(0, dataFromPost.length - 1); // Remove trailing characters after '}'
+            breakOut++;
+            if(breakOut > 100000){
+                break;
+            }
         }
 
         if(dataFromPost){
