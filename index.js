@@ -37,19 +37,19 @@ app.post('/', function(request, response) {
     
     if(postBody){
         var dataFromPost = decodeURI(postBody.data).replace(/%2C/g,",").replace(/'/g, '"');
-        while(dataFromPost.charAt(0) === '\"')
+        while(dataFromPost.charAt(0) !== '{')
         {
-            dataFromPost = dataFromPost.substr(1); // Remove leading quotes 
+            dataFromPost = dataFromPost.substr(1); // Remove leading characters before '{' 
         }
-        while(dataFromPost.charAt(dataFromPost.length - 1) === '\"')
+        while(dataFromPost.charAt(dataFromPost.length - 1) !== '}')
         {
-            dataFromPost = dataFromPost.substr(0, dataFromPost.length - 1); // Remove trailing quotes             
+            dataFromPost = dataFromPost.substr(0, dataFromPost.length - 1); // Remove trailing characters after '}'
         }
-                
+
         if(dataFromPost){
             try {
                 var parsedData = JSON.parse(dataFromPost);
-                if (parsedData) {                    
+                if (parsedData) {
                     // Request contains data, try to use the data 
                     CalculateWaypoints(parsedData, response);
                     proccessedRequest = true;
@@ -143,5 +143,4 @@ function CalculateWaypoints(dataPoints, res){
 
     console.log("Done!-----------------------");
     console.log(JSON.stringify(waypoints));
-    
 }
