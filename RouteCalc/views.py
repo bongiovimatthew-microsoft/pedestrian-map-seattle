@@ -8,7 +8,7 @@ import urllib.parse
 
 # issue-manish-06112017 there's prolly a better way to do this 
 import sys
-sys.path.insert(0, '..\datacleaners')
+#sys.path.insert(0, '..\datacleaners')
 from DataCleaners import DataAggregator
 
 
@@ -25,7 +25,7 @@ def RouteCalcCore(request):
     print("request.POST: ")
     pp(request.body)
 
-    aggregator = DataAggregator()
+    aggregator = DataAggregator.DataAggregator()
 
     requestBodyString = str(request.body.decode('utf-8'))
     if not requestBodyString: 
@@ -41,7 +41,7 @@ def RouteCalcCore(request):
     allData = aggregator.GetAllCleanData(dateRange, boundingBox, knobWeights)
     
     # Make request to node.js endpoint 
-    fullUrl = "http://127.0.0.1:8080?data="
+    fullUrl = "https://waypointcalc.herokuapp.com/?data="
     safe = '$\':'
     fullUrl += urllib.parse.quote(str(allData), safe = safe)
     req = urllib.request.Request(fullUrl)

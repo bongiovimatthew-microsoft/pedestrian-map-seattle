@@ -1,9 +1,9 @@
 import json
 from datetime import datetime, timedelta
 
-from ICleaner import ICleaner
-from HttpRequestManager import HttpRequestManager
-from JsonCleaner import JsonCleaner
+from .ICleaner import ICleaner
+from .HttpRequestManager import HttpRequestManager
+from .JsonCleaner import JsonCleaner
 
 class SeattleNatureCleaner(ICleaner):  
 
