@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>directionsShowAllWaypointsHTML</title>
+        <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+    </head>
+    <body>
+        <div id='printoutPanel'></div>
+        
+        <div id='myMap' style='width: 100vw; height: 100vh;'></div>
+        <script type='text/javascript'>
+							
+			var sendRequestFunction = function() {
+			    var http = new XMLHttpRequest();
+			    var url = "http://127.0.0.1:8000/routeCalc/";
+			    var knobs = { "Accessibility": 0.5, "Safety": 1, "Nature": 0.2, "Toilets": 0.1 }
+			    var params = {"startLatitude" : startPoint[1], "startLongitude": startPoint[0], "endLatitude": endPoint[1], "endLongitude": endPoint[0], "knobWeights": knobs}
+			    
+			    console.log(params)
+			    console.log(JSON.stringify(params))
+			    http.open("POST", url, true);
+
+			    //Send the proper header information along with the request
+			    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			    // http.setRequestHeader("Access-Control-Allow-Origin", "*");
+
+			    http.onreadystatechange = function() {//Call a function when the state changes.
+			        if(http.readyState == 4 && http.status == 200) {
+			            console.log(http.responseText);
+			        }
+			    }
+			    console.log(JSON.stringify(params));
+			    http.send(JSON.stringify(params));
+			}
+
+            function loadMapScenario() {
+
+				var map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
+				    credentials: 'AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf',
+		            center: new Microsoft.Maps.Location(47.606209, -122.332071),
+		            zoom: 12
+				});
+
+                Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
+                    var directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+                    // Set Route Mode to walking
+                    directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking });
+
+                    // the 2 main way points
+                    var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.621761, -122.307326) });
+                    var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.610163, -122.332888)});
+
+
+                    directionsManager.addWaypoint(waypoint1);
+                    // directionsManager.addWaypoint(waypoint3);
+                    directionsManager.addWaypoint(waypoint2);
+
+                    // var waypoint3 = new Microsoft.Maps.Directions.Waypoint({ location: 'Belltown Cottage Park' });
+
+
+
+
+                    // the data we wil get back
+					// viaWaypointsToUse = [{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31912785169993,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31620660949993,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.32204909389995,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31036412509994,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31328536729993,47.61572369263105]}}] 
+
+					viaWaypointsToUse = [{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.320810, 47.614070]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.326912, 47.614077]}}] 
+
+						var pushpins = [];
+
+						console.log(viaWaypointsToUse)
+					    for (var i = 0; i < viaWaypointsToUse.length; ++i) {
+							wp = viaWaypointsToUse[i];
+
+						    //Create custom Pushpin
+						    var pointLoc = new Microsoft.Maps.Location(wp["geometry"]["coordinates"][1], wp["geometry"]["coordinates"][0]);
+						    var pin = new Microsoft.Maps.Pushpin(pointLoc, {
+						        color: 'red'
+						    });
+						    pushpins.push(pin)
+
+						    // create the via point to add to the direction manager
+						    var viaWayPoint = new Microsoft.Maps.Directions.Waypoint({ location: pointLoc, isViaPoint: true });
+	                    	// directionsManager.addWaypoint(viaWayPoint);
+						}
+
+						console.log(pushpins)
+
+						// add the pushpins data
+						var layer = new Microsoft.Maps.Layer();
+						layer.add(pushpins);
+						map.layers.insert(layer);
+
+	                    // Set the element in which the itinerary will be rendered
+	                    directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
+	                    directionsManager.calculateDirections();
+					});
+
+
+
+		        startPoint = [47.636030, -122.365352]
+		        endPoint = [47.578296, -122.288318]
+				sendRequestFunction();
+                
+            }
+        </script>
+        <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=loadMapScenario' async defer></script>
+    </body>
+</html>
