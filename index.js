@@ -28,6 +28,34 @@ app.get('/', function(request, response) {
     response.end(); //end the response
 });
 
+app.post('/', function(request, response) {
+    var postBody = request.body; 
+    var proccessedRequest = false;
+    
+    if(postBody){
+        var dataFromPost = postBody.data;
+        if(dataFromPost){
+            try {
+                var parsedData = JSON.parse(dataFromPost.replace(/'/g, '"'));
+                
+                if (parsedData) {
+                    // Request contains data, try to use the data 
+                    CalculateWaypoints(parsedData, response);
+                    proccessedRequest = true;
+                }
+            } catch(e) {
+                console.log("Something went wrong." + e);
+                response.end("Something bad happened on your request. Sorry about that.");
+            }
+        }
+    }
+    if(!proccessedRequest){
+        response.write("Sorry, we could not process your request. Please include POST param 'data=<bla>', and ensure data blob is in the correct GeoJSON format.");
+    }
+
+    response.end(); //end the response
+});
+
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
