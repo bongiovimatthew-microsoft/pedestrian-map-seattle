@@ -40,12 +40,18 @@ def RouteCalcCore(request):
 
     allData = aggregator.GetAllCleanData(dateRange, boundingBox, knobWeights)
     
+    print(allData)
+    
     # Make request to node.js endpoint 
-    fullUrl = "https://waypointcalc.herokuapp.com/?data="
+    fullUrl = "https://waypointcalc.herokuapp.com/" 
     safe = '$\':'
-    fullUrl += urllib.parse.quote(str(allData), safe = safe)
+    urlEncodedData = urllib.parse.quote(str(allData), safe = safe).encode('utf8')
+    postBody = { "data": urlEncodedData }
+    
+    print(postBody)
+    
     req = urllib.request.Request(fullUrl)
-    response = urllib.request.urlopen(req, timeout = 10)
+    response = urllib.request.urlopen(req, timeout = 10, data = urlEncodedData)
     responseStr = (response.read().decode('utf8'))
     print(responseStr)
     
