@@ -2,9 +2,12 @@ var http = require('http');
 var turf = require('./turf.min.js');
 var url = require('url');
 var express = require('express');
+var bodyParser = require('body-parser');
 
 var app = express();
 
+app.use(bodyParser.json({limit: '500mb'})); // support json encoded bodies
+app.use(bodyParser.urlencoded({ limit: '500mb', extended: true })); // support encoded bodies
 app.set('port', (process.env.PORT || 5000));
 
 app.get('/', function(request, response) {
@@ -33,19 +36,27 @@ app.post('/', function(request, response) {
     var proccessedRequest = false;
     
     if(postBody){
-        var dataFromPost = postBody.data;
+        var dataFromPost = decodeURI(postBody.data).replace(/%2C/g,",").replace(/'/g, '"');
+        while(dataFromPost.charAt(0) === '\"')
+        {
+            dataFromPost = dataFromPost.substr(1); // Remove leading quotes 
+        }
+        while(dataFromPost.charAt(dataFromPost.length - 1) === '\"')
+        {
+            dataFromPost = dataFromPost.substr(0, dataFromPost.length - 1); // Remove trailing quotes             
+        }
+                
         if(dataFromPost){
             try {
-                var parsedData = JSON.parse(dataFromPost.replace(/'/g, '"'));
-                
-                if (parsedData) {
+                var parsedData = JSON.parse(dataFromPost);
+                if (parsedData) {                    
                     // Request contains data, try to use the data 
                     CalculateWaypoints(parsedData, response);
                     proccessedRequest = true;
                 }
             } catch(e) {
                 console.log("Something went wrong." + e);
-                response.end("Something bad happened on your request. Sorry about that.");
+                response.write("Something bad happened on your request. Sorry about that.");
             }
         }
     }
