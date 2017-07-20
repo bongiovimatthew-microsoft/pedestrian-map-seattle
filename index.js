@@ -39,44 +39,18 @@ app.post('/', function(request, response) {
     console.log(postBody);
     
     if(postBody){
-        var dataFromPost = decodeURI(postBody.data).replace(/%2C/g,",").replace(/'/g, '"');
+        var dataFromPost = postBody.data;
         console.log("DataFromPost: ");
         console.log(dataFromPost);
-        
-        var breakOut = 0;
-        while(dataFromPost.charAt(0) !== '{')
-        {
-            dataFromPost = dataFromPost.substr(1); // Remove leading characters before '{' 
-            breakOut++;
-            if(breakOut > 100000){
-                break;
-            }
-        }
-        
-        breakOut = 0;
-        while(dataFromPost.charAt(dataFromPost.length - 1) !== '}')
-        {
-            dataFromPost = dataFromPost.substr(0, dataFromPost.length - 1); // Remove trailing characters after '}'
-            breakOut++;
-            if(breakOut > 100000){
-                break;
-            }
-        }
 
         if(dataFromPost){
             try {
-                console.log("Decoded data: ");
-                console.log(dataFromPost);
-                var parsedData = JSON.parse(dataFromPost);
-                if (parsedData) {
-                    console.log("Begin waypoint calculation");
-                    console.log("Parsed Data: ");
-                    console.log(parsedData);
+                console.log("Begin waypoint calculation");
                     
-                    // Request contains data, try to use the data 
-                    CalculateWaypoints(parsedData, response);
-                    proccessedRequest = true;
-                }
+                // Request contains data, try to use the data 
+                CalculateWaypoints(parsedData, response);
+                proccessedRequest = true;
+                
             } catch(e) {
                 console.log("Something went wrong." + e);
                 response.write("Something bad happened on your request. Sorry about that.");
