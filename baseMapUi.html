@@ -52,8 +52,6 @@
 
 
                     directionsManager.addWaypoint(waypoint1);
-                    // directionsManager.addWaypoint(waypoint3);
-                    directionsManager.addWaypoint(waypoint2);
 
                     // var waypoint3 = new Microsoft.Maps.Directions.Waypoint({ location: 'Belltown Cottage Park' });
 
@@ -80,7 +78,7 @@
 
                             // create the via point to add to the direction manager
                             var viaWayPoint = new Microsoft.Maps.Directions.Waypoint({ location: pointLoc, isViaPoint: true });
-                            // directionsManager.addWaypoint(viaWayPoint);
+                            directionsManager.addWaypoint(viaWayPoint);
                         }
 
                         console.log(pushpins)
@@ -89,6 +87,8 @@
                         var layer = new Microsoft.Maps.Layer();
                         layer.add(pushpins);
                         map.layers.insert(layer);
+                        // directionsManager.addWaypoint(waypoint3);
+                        directionsManager.addWaypoint(waypoint2);
 
                         // Set the element in which the itinerary will be rendered
                         directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
