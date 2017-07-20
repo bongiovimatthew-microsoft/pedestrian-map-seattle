@@ -48,7 +48,7 @@ app.post('/', function(request, response) {
                 console.log("Begin waypoint calculation");
                     
                 // Request contains data, try to use the data 
-                CalculateWaypoints(parsedData, response);
+                CalculateWaypoints(dataFromPost, response);
                 proccessedRequest = true;
                 
             } catch(e) {
