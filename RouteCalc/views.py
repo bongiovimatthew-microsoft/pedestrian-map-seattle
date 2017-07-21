@@ -58,5 +58,8 @@ def RouteCalcCore(request):
     response = urllib.request.urlopen(req, timeout = 60, data = json_data)
     responseStr = (response.read().decode('utf8'))
     print(responseStr)
+    print(json.loads(responseStr))
+
+    responseDict = {"waypoints": json.loads(responseStr)}
     
-    return response
+    return JsonResponse(responseDict)
