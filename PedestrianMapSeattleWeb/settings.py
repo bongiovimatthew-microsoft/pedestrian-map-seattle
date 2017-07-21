@@ -25,7 +25,7 @@ SECRET_KEY = '1kty@@9n8&#qn=xeg7%gt8r$^1zyt*0!x9anic*v08#^z)@xa4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pedestrianmapseattle3.azurewebsites.net']
 
 
 # Application definition
