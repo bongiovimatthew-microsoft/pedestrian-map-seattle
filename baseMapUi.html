@@ -9,7 +9,14 @@
         
         <div id='myMap' style='width: 100vw; height: 100vh;'></div>
         <script type='text/javascript'>
-                            
+            function wayPointOrderFunction(x, y) {
+                firstTempWP = [x["geometry"]["coordinates"][1], x["geometry"]["coordinates"][0]]
+                secondTempWP = [y["geometry"]["coordinates"][1], y["geometry"]["coordinates"][0]]
+                return (getDistanceBetweenTwoPoints(firstTempWP, startPoint) > getDistanceBetweenTwoPoints(secondTempWP, startPoint))
+        }
+            function getDistanceBetweenTwoPoints(x, y) {
+                return (Math.pow(x[1] - y[1], 2) + Math.pow(x[0] - y[0], 2))
+            }
 
             function loadMapScenario() {
 
@@ -31,14 +38,6 @@
 
                     directionsManager.addWaypoint(waypoint1);
 
-                    // var waypoint3 = new Microsoft.Maps.Directions.Waypoint({ location: 'Belltown Cottage Park' });
-
-
-
-
-                    // the data we wil get back
-                    // viaWaypointsToUse = [{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31912785169993,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31620660949993,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.32204909389995,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31036412509994,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31328536729993,47.61572369263105]}}] 
-
                     var http = new XMLHttpRequest();
                     var url = "http://127.0.0.1:8000/routeCalc/";
                     var knobs = { "Accessibility": 0.5, "Safety": 1, "Nature": 0.2, "Toilets": 0.1 }
@@ -53,12 +52,12 @@
 
                     //Send the proper header information along with the request
                     http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    // http.setRequestHeader("Access-Control-Allow-Origin", "*");
 
                     http.onreadystatechange = function() {//Call a function when the state changes.
                         if(http.readyState == 4 && http.status == 200) {
                             console.log(http.responseText);
                             var viaWaypointsToUse = (JSON.parse(http.responseText)).waypoints
+                            viaWaypointsToUse.sort(wayPointOrderFunction);
                             
                             var pushpins = [];
 
@@ -66,7 +65,6 @@
                             for (var i = 0; i < viaWaypointsToUse.length; ++i) {
                                 wp = viaWaypointsToUse[i];
 
-                                console.log(wp)
                                 //Create custom Pushpin
                                 var pointLoc = new Microsoft.Maps.Location(wp["geometry"]["coordinates"][1], wp["geometry"]["coordinates"][0]);
                                 var pin = new Microsoft.Maps.Pushpin(pointLoc, {
@@ -76,7 +74,9 @@
 
                                 // create the via point to add to the direction manager
                                 var viaWayPoint = new Microsoft.Maps.Directions.Waypoint({ location: pointLoc, isViaPoint: true });
-                                // directionsManager.addWaypoint(viaWayPoint);
+                                directionsManager.addWaypoint(viaWayPoint);
+
+
                             }
 
                             console.log(pushpins)
@@ -85,7 +85,6 @@
                             var layer = new Microsoft.Maps.Layer();
                             layer.add(pushpins);
                             map.layers.insert(layer);
-                            // directionsManager.addWaypoint(waypoint3);
                             directionsManager.addWaypoint(waypoint2);
 
                             // Set the element in which the itinerary will be rendered
