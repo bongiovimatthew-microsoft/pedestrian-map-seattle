@@ -10,28 +10,6 @@
         <div id='myMap' style='width: 100vw; height: 100vh;'></div>
         <script type='text/javascript'>
                             
-            var sendRequestFunction = function() {
-                var http = new XMLHttpRequest();
-                var url = "http://127.0.0.1:8000/routeCalc/";
-                var knobs = { "Accessibility": 0.5, "Safety": 1, "Nature": 0.2, "Toilets": 0.1 }
-                var params = {"startLatitude" : startPoint[1], "startLongitude": startPoint[0], "endLatitude": endPoint[1], "endLongitude": endPoint[0], "knobWeights": knobs}
-                
-                console.log(params)
-                console.log(JSON.stringify(params))
-                http.open("POST", url, true);
-
-                //Send the proper header information along with the request
-                http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                // http.setRequestHeader("Access-Control-Allow-Origin", "*");
-
-                http.onreadystatechange = function() {//Call a function when the state changes.
-                    if(http.readyState == 4 && http.status == 200) {
-                        console.log(http.responseText);
-                    }
-                }
-                console.log(JSON.stringify(params));
-                http.send(JSON.stringify(params));
-            }
 
             function loadMapScenario() {
 
@@ -61,45 +39,65 @@
                     // the data we wil get back
                     // viaWaypointsToUse = [{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31912785169993,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31620660949993,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.32204909389995,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31036412509994,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31328536729993,47.61572369263105]}}] 
 
-                    viaWaypointsToUse = [{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.320810, 47.614070]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.326912, 47.614077]}}] 
+                    var http = new XMLHttpRequest();
+                    var url = "http://routecalculator.herokuapp.com/routeCalc/";
+                    var knobs = { "Accessibility": 0.5, "Safety": 1, "Nature": 0.2, "Toilets": 0.1 }
+                    startPoint = [47.61526058559883, -122.32351198399039]
+                    endPoint = [47.612937373632036, -122.3088754083908]
+                    
+                    var params = {"startLatitude" : startPoint[0], "startLongitude": startPoint[1], "endLatitude": endPoint[0], "endLongitude": endPoint[1], "knobWeights": knobs}
+                    
+                    console.log(params)
+                    console.log(JSON.stringify(params))
+                    http.open("POST", url, true);
 
-                        var pushpins = [];
+                    //Send the proper header information along with the request
+                    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    // http.setRequestHeader("Access-Control-Allow-Origin", "*");
 
-                        console.log(viaWaypointsToUse)
-                        for (var i = 0; i < viaWaypointsToUse.length; ++i) {
-                            wp = viaWaypointsToUse[i];
+                    http.onreadystatechange = function() {//Call a function when the state changes.
+                        if(http.readyState == 4 && http.status == 200) {
+                            console.log(http.responseText);
+                            viaWaypointToUse = http.responseText
+                            
+                            var pushpins = [];
 
-                            //Create custom Pushpin
-                            var pointLoc = new Microsoft.Maps.Location(wp["geometry"]["coordinates"][1], wp["geometry"]["coordinates"][0]);
-                            var pin = new Microsoft.Maps.Pushpin(pointLoc, {
-                                color: 'red'
-                            });
-                            pushpins.push(pin)
+                            console.log(viaWaypointsToUse)
+                            for (var i = 0; i < viaWaypointsToUse.length; ++i) {
+                                wp = viaWaypointsToUse[i];
 
-                            // create the via point to add to the direction manager
-                            var viaWayPoint = new Microsoft.Maps.Directions.Waypoint({ location: pointLoc, isViaPoint: true });
-                            directionsManager.addWaypoint(viaWayPoint);
+                                //Create custom Pushpin
+                                var pointLoc = new Microsoft.Maps.Location(wp["geometry"]["coordinates"][1], wp["geometry"]["coordinates"][0]);
+                                var pin = new Microsoft.Maps.Pushpin(pointLoc, {
+                                    color: 'red'
+                                });
+                                pushpins.push(pin)
+
+                                // create the via point to add to the direction manager
+                                var viaWayPoint = new Microsoft.Maps.Directions.Waypoint({ location: pointLoc, isViaPoint: true });
+                                directionsManager.addWaypoint(viaWayPoint);
+                            }
+
+                            console.log(pushpins)
+
+                            // add the pushpins data
+                            var layer = new Microsoft.Maps.Layer();
+                            layer.add(pushpins);
+                            map.layers.insert(layer);
+                            // directionsManager.addWaypoint(waypoint3);
+                            directionsManager.addWaypoint(waypoint2);
+
+                            // Set the element in which the itinerary will be rendered
+                            directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
+                            directionsManager.calculateDirections();
                         }
+                    }
+                    console.log(JSON.stringify(params));
+                    http.send(JSON.stringify(params));
+                    
 
-                        console.log(pushpins)
-
-                        // add the pushpins data
-                        var layer = new Microsoft.Maps.Layer();
-                        layer.add(pushpins);
-                        map.layers.insert(layer);
-                        // directionsManager.addWaypoint(waypoint3);
-                        directionsManager.addWaypoint(waypoint2);
-
-                        // Set the element in which the itinerary will be rendered
-                        directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
-                        directionsManager.calculateDirections();
+                        
                     });
-
-
-
-                startPoint = [47.636030, -122.365352]
-                endPoint = [47.578296, -122.288318]
-                sendRequestFunction();
                 
             }
         </script>
