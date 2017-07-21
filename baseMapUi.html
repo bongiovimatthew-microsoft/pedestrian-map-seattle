@@ -25,8 +25,8 @@
                     directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking });
 
                     // the 2 main way points
-                    var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.621761, -122.307326) });
-                    var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.610163, -122.332888)});
+                    var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.61526058559883, -122.32351198399039) });
+                    var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.612937373632036, -122.3088754083908)});
 
 
                     directionsManager.addWaypoint(waypoint1);
@@ -40,7 +40,7 @@
                     // viaWaypointsToUse = [{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31912785169993,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31620660949993,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.32204909389995,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31036412509994,47.61572369263105]}},{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[-122.31328536729993,47.61572369263105]}}] 
 
                     var http = new XMLHttpRequest();
-                    var url = "http://routecalculator.herokuapp.com/routeCalc/";
+                    var url = "http://127.0.0.1:8000/routeCalc/";
                     var knobs = { "Accessibility": 0.5, "Safety": 1, "Nature": 0.2, "Toilets": 0.1 }
                     startPoint = [47.61526058559883, -122.32351198399039]
                     endPoint = [47.612937373632036, -122.3088754083908]
@@ -58,7 +58,7 @@
                     http.onreadystatechange = function() {//Call a function when the state changes.
                         if(http.readyState == 4 && http.status == 200) {
                             console.log(http.responseText);
-                            viaWaypointToUse = http.responseText
+                            var viaWaypointsToUse = (JSON.parse(http.responseText)).waypoints
                             
                             var pushpins = [];
 
@@ -66,6 +66,7 @@
                             for (var i = 0; i < viaWaypointsToUse.length; ++i) {
                                 wp = viaWaypointsToUse[i];
 
+                                console.log(wp)
                                 //Create custom Pushpin
                                 var pointLoc = new Microsoft.Maps.Location(wp["geometry"]["coordinates"][1], wp["geometry"]["coordinates"][0]);
                                 var pin = new Microsoft.Maps.Pushpin(pointLoc, {
@@ -75,7 +76,7 @@
 
                                 // create the via point to add to the direction manager
                                 var viaWayPoint = new Microsoft.Maps.Directions.Waypoint({ location: pointLoc, isViaPoint: true });
-                                directionsManager.addWaypoint(viaWayPoint);
+                                // directionsManager.addWaypoint(viaWayPoint);
                             }
 
                             console.log(pushpins)
