@@ -59,4 +59,4 @@ def RouteCalcCore(request):
     responseStr = (response.read().decode('utf8'))
     print(responseStr)
     
-    return JsonResponse(responseStr)
+    return response
