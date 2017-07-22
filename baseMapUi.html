@@ -8,17 +8,43 @@
         <div id='printoutPanel'></div>
         
         <div id='myMap' style='width: 100vw; height: 100vh;'></div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script type='text/javascript'>
+            
             function wayPointOrderFunction(x, y) {
                 firstTempWP = [x["geometry"]["coordinates"][1], x["geometry"]["coordinates"][0]]
                 secondTempWP = [y["geometry"]["coordinates"][1], y["geometry"]["coordinates"][0]]
                 return (getDistanceBetweenTwoPoints(firstTempWP, startPoint) > getDistanceBetweenTwoPoints(secondTempWP, startPoint))
-        }
+            }
+            
             function getDistanceBetweenTwoPoints(x, y) {
                 return (Math.pow(x[1] - y[1], 2) + Math.pow(x[0] - y[0], 2))
             }
 
+            function processSnapToRoadResponse(data) {
+              snappedCoordinates = [];
+              for (var i = 1; i < data.snappedPoints.length - 1; i++) {
+                var latlng = [
+                    data.snappedPoints[i].location.latitude,
+                    data.snappedPoints[i].location.longitude];
+                snappedCoordinates.push(latlng);
+              }
+            }
+
+            // First, checks if it isn't implemented yet.
+            if (!String.prototype.format) {
+              String.prototype.format = function() {
+                var args = arguments;
+                return this.replace(/{(\d+)}/g, function(match, number) { 
+                  return typeof args[number] != 'undefined'
+                    ? args[number]
+                    : match
+                  ;
+                });
+              };
+            }
             function loadMapScenario() {
+                var apiKey = 'AIzaSyDhdh1eXucfnK3EytcFAqTd7rt8-y9N7bw';
 
                 var map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
                     credentials: 'AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf',
@@ -44,9 +70,9 @@
                     startPoint = [47.61526058559883, -122.32351198399039]
                     endPoint = [47.612937373632036, -122.3088754083908]
                     
-                    var params = {"startLatitude" : startPoint[0] - 0.005,
-                                  "startLongitude": startPoint[1] - 0.005,
-                                  "endLatitude": endPoint[0] + 0.005,
+                    var params = {"startLatitude" : startPoint[0],
+                                  "startLongitude": startPoint[1],
+                                  "endLatitude": endPoint[0] ,
                                   "endLongitude": endPoint[1] + 0.005,
                                   "knobWeights": knobs,
                                   "includeData": 1
@@ -61,18 +87,52 @@
 
                     http.onreadystatechange = function() {//Call a function when the state changes.
                         if(http.readyState == 4 && http.status == 200) {
+                            var pushpins = [];
+
                             console.log(http.responseText);
                             var viaWaypointsToUse = (JSON.parse(http.responseText)).waypoints
                             viaWaypointsToUse.sort(wayPointOrderFunction);
-                            
-                            var pushpins = [];
 
-                            console.log(viaWaypointsToUse)
+                            pathValues = []
+                            pathValues.push("{0},{1}".format(startPoint[0], startPoint[1]))
                             for (var i = 0; i < viaWaypointsToUse.length; ++i) {
                                 wp = viaWaypointsToUse[i];
+                                var pointLoc = "{0},{1}".format(wp["geometry"]["coordinates"][1], wp["geometry"]["coordinates"][0]);
+                                pathValues.push(pointLoc)
 
+                                var pointLocObj = new Microsoft.Maps.Location(wp["geometry"]["coordinates"][1], wp["geometry"]["coordinates"][0]);
+                                var pin = new Microsoft.Maps.Pushpin(pointLocObj, {
+                                    color: 'purple'
+                                });
+                                pushpins.push(pin)
+                            }
+                            pathValues.push("{0},{1}".format(endPoint[0], endPoint[1]))
+
+                            console.log(pathValues)
+
+                            var snapToRoadsGetUrl = "https://roads.googleapis.com/v1/snapToRoads?path={0}&interpolate=false&key={1}".format(pathValues.join('|'), apiKey)
+                            var request = new XMLHttpRequest();
+                            request.open('GET', snapToRoadsGetUrl, false);  // `false` makes the request synchronous
+                            request.send(null);
+
+                            actualWayPoints = []
+                            if (request.status === 200) {
+                                console.log(request.responseText);
+                                var snappedData = (JSON.parse(request.responseText));
+                                for (var i = 1; i < snappedData.snappedPoints.length - 1; i++) {
+                                    var latlng = [
+                                        snappedData.snappedPoints[i].location.latitude,
+                                        snappedData.snappedPoints[i].location.longitude];
+                                    actualWayPoints.push(latlng);
+                                }
+                            }
+
+
+                            console.log(actualWayPoints)
+                            for (var i = 0; i < actualWayPoints.length; ++i) {
+                                var actualWayPoint = actualWayPoints[i]
                                 //Create custom Pushpin
-                                var pointLoc = new Microsoft.Maps.Location(wp["geometry"]["coordinates"][1], wp["geometry"]["coordinates"][0]);
+                                var pointLoc = new Microsoft.Maps.Location(actualWayPoint[0], actualWayPoint[1]);
                                 var pin = new Microsoft.Maps.Pushpin(pointLoc, {
                                     color: 'red'
                                 });
