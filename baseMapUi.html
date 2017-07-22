@@ -44,7 +44,13 @@
                     startPoint = [47.61526058559883, -122.32351198399039]
                     endPoint = [47.612937373632036, -122.3088754083908]
                     
-                    var params = {"startLatitude" : startPoint[0], "startLongitude": startPoint[1], "endLatitude": endPoint[0], "endLongitude": endPoint[1], "knobWeights": knobs}
+                    var params = {"startLatitude" : startPoint[0] - 0.005,
+                                  "startLongitude": startPoint[1] - 0.005,
+                                  "endLatitude": endPoint[0] + 0.005,
+                                  "endLongitude": endPoint[1] + 0.005,
+                                  "knobWeights": knobs,
+                                  "includeData": 1
+                                  }
                     
                     console.log(params)
                     console.log(JSON.stringify(params))
@@ -75,11 +81,39 @@
                                 // create the via point to add to the direction manager
                                 var viaWayPoint = new Microsoft.Maps.Directions.Waypoint({ location: pointLoc, isViaPoint: true });
                                 directionsManager.addWaypoint(viaWayPoint);
-
-
                             }
 
-                            console.log(pushpins)
+                            var dataPointsToUse = (JSON.parse(http.responseText)).data
+                            for (var i = 0; i < dataPointsToUse.length; ++i) {
+                                dp = dataPointsToUse[i];
+
+                                //Create custom Pushpin
+                                var pointLoc = new Microsoft.Maps.Location(dp["geometry"]["coordinates"][1], dp["geometry"]["coordinates"][0]);
+
+                                var color = 'green'
+                                if (dp["properties"]["knob"] == "Accessibility") {
+                                    color = 'green';
+                                }
+                                else if (dp["properties"]["knob"] == "Safety") {
+                                    color = 'yellow';
+                                }
+
+                                else if (dp["properties"]["knob"] == "Nature") {
+                                    color = 'blue';
+
+                                }
+
+                                else if (dp["properties"]["knob"] == "Toilets") {
+                                    color = 'orange';
+                                }
+
+                                var pin = new Microsoft.Maps.Pushpin(pointLoc, {
+                                    color: color
+                                });
+                                pushpins.push(pin)
+                            }
+
+                            // console.log(pushpins)
 
                             // add the pushpins data
                             var layer = new Microsoft.Maps.Layer();

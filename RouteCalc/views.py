@@ -61,5 +61,7 @@ def RouteCalcCore(request):
     print(json.loads(responseStr))
 
     responseDict = {"waypoints": json.loads(responseStr)}
+    if ("includeData" in requestDict.keys()):
+        responseDict["data"] = allData["features"]
     
     return JsonResponse(responseDict)
