@@ -28,9 +28,9 @@ Routes that look for **Pet Friendliness** will seek routes that are near parks, 
 ## Public Toilets
 Routes that look for **Public Toilets** will seek routes that are near public toilets. This data should be based on city public toilet locations, and can also include user-provided data on the quality of public toilets.
 
-<TODO: add definitions>
-Road/sidewalk quality
-Construction
-Weather conditions
-Light coverage
-Free Wifi
+<FIXME: add definitions>
+* Road/sidewalk quality
+* Construction
+* Weather conditions
+* Light coverage
+* Free Wifi

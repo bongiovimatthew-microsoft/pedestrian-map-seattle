@@ -1,20 +1,26 @@
-Compiling and Running CityPulse:
+# Compile and run CityPulse
 
-The back-end for CityPulse is made up of two services, a django web app, and a node.js web app.
+The backend for CityPulse is made up of two services:
+* Django web app
+* Node.js web app
 
-Route Calculation Endpoint (django):
+## Route calculation endpoint (Django):
 
-Install dependencies:
-pip install django
-pip install django-cors-headers
+1. Install dependencies.
 
-Run the web app:
-Python .\PedestrianMapSeattleWeb\manage.py runserver
+```pip install django```
+```pip install django-cors-headers```
 
-Waypoint Calculation Endpoint (node.js):
+2. Run the web app.
 
-Install dependencies:
-Install node.js
+```Python .\PedestrianMapSeattleWeb\manage.py runserver```
 
-Run the web app:
-node .\calculationLayer\waypointCalculator_node.js
+## Waypoint calculation endpoint (Node.js):
+
+1. Install dependencies.
+
+```Install node.js```
+
+2. Run the web app.
+
+```node .\calculationLayer\waypointCalculator_node.js```
