@@ -72,6 +72,40 @@ def getGeoJSONFromWayPointsCoord(wayPointsCoordsArray):
 
     return wayPointsGeoJSONDictArray
 
+def getRouteUsingBingAPI(snappedPointsCoordsArray, startPointCoord, endPointCoord):
+    # Make the request to the bing directions endpoint using
+    #  the waypoints calculated in the previous step 
+    
+    bingReq = "http://dev.virtualearth.net/REST/V1/Routes/Walking?optmz=distance&output=json" 
+
+    # Add start coord
+    bingReq += "&wp.0={0},{1}".format(startPointCoord[0], startPointCoord[1])
+
+    # Specifying a waypoint as a Point 
+    # The coordinates are double values that are separated by commas and are specified in the following order.
+    # Latitude,Longitude
+    # Use the following ranges of values:
+    # Latitude (degrees): [-90, +90]
+    # Longitude (degrees): [-180,+180]
+    # Example: 47.610679194331169, -122.10788659751415
+    wayPointIndex = 1
+    for viaWayPoint in snappedPointsCoordsArray:
+        bingReq += "&vwp.{0}={1},{2}".format(wayPointIndex, viaWayPoint[0], viaWayPoint[1])
+        wayPointIndex += 1
+
+    # Add end coord and key
+    bingReq += "&wp.{0}={1},{2}".format(wayPointIndex, endPointCoord[0], endPointCoord[1])
+    bingReq += "&key=AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf"
+    print(bingReq)
+
+    req = urllib.request.Request(bingReq)
+    response = urllib.request.urlopen(req, timeout = 10)
+    responseStr = response.read() 
+    
+    print(str(responseStr))
+    return
+
+
 # issue-manigu-06112017 remove csrf exempt
 # issue-manigu-06112017 using post for now, might want to make this a get?
 # todo-manigu-06122017 validate all points are in the request
@@ -119,12 +153,17 @@ def RouteCalcCore(request):
     snappedPointsReceived = json.loads(snappedPointsResponseStr)
     # print(snappedPointsReceived)
     # print(snappedPointsReceived[0])
-    snappedPointsCoordsArray = [[snappedWayPoint["location"]["latitude"], snappedWayPoint["location"]["longitude"]] for snappedWayPoint in snappedPointsReceived["snappedPoints"]] 
+    snappedPointsCoordsArray = [[snappedWayPoint["location"]["latitude"], snappedWayPoint["location"]["longitude"]] for snappedWayPoint in (snappedPointsReceived["snappedPoints"])[1:len(snappedPointsReceived["snappedPoints"]) - 1]] 
 
     wayPointsGeoJSONDictArray = getGeoJSONFromWayPointsCoord(snappedPointsCoordsArray)
+
+    # Get bing route
+    getRouteUsingBingAPI(snappedPointsCoordsArray, startPointCoord, endPointCoord)
 
     responseDict = {"waypoints": wayPointsGeoJSONDictArray}
     if ("includeData" in requestDict.keys()):
         responseDict["data"] = allData["features"]
+
+    print(wayPointsGeoJSONDictArray)
 
     return JsonResponse(responseDict)

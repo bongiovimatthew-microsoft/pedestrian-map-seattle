@@ -37,6 +37,9 @@
 
             var map;
             var directionsManager;
+            var bingMapsAPIKey = 'AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf';
+            var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
+            var oldRouteCoords = [];
 
             function getDistanceBetweenTwoPoints(coord1, coord2) {
                 return Math.sqrt(Math.pow(coord1[1] - coord2[1], 2) + Math.pow(coord1[0] - coord2[0], 2))
@@ -60,78 +63,73 @@
             }
 
             function directionsUpdatedFunc(directionsEvent) {
+                var startWaypointLocation = [directionsEvent.route[0].routeLegs[0].startWaypointLocation.latitude, directionsEvent.route[0].routeLegs[0].startWaypointLocation.longitude]
+                var endWaypointLocation = [directionsEvent.route[0].routeLegs[0].endWaypointLocation.latitude, directionsEvent.route[0].routeLegs[0].endWaypointLocation.longitude]
+                var currentRouteCoords = [startWaypointLocation, endWaypointLocation];
+
+                console.log(directionsEvent);
                 var route = directionsManager.getRouteResult();
+                var newRoute = false;
+
+                if (oldRouteCoords.length != currentRouteCoords.length) {
+                    newRoute = true;
+                }
+                else {
+                    if (checkIfTwoPointsAreTheSame(oldRouteCoords[0], currentRouteCoords[0]) &&
+                        checkIfTwoPointsAreTheSame(oldRouteCoords[1], currentRouteCoords[1])) {
+                        newRoute = false;
+                    }
+                    else {
+                        newRoute = true;
+                    }
+                }
 
                 console.log(route);
+                console.log(newRoute);
 
-                for (var itineraryLegsIndex = 0; itineraryLegsIndex < route[0].routeLegs[0].itineraryItems.length; itineraryLegsIndex++) {
-                    if ((route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].maneuver === "Unknown") &&
-                        (checkIfFormattedItineraryTextSaysTurnBack(route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].formattedText))) {
+                if (! newRoute) {
+                    for (var itineraryLegsIndex = 0; itineraryLegsIndex < route[0].routeLegs[0].itineraryItems.length; itineraryLegsIndex++) {
+                        if ((route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].maneuver === "Unknown") &&
+                            (checkIfFormattedItineraryTextSaysTurnBack(route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].formattedText))) {
 
-                        console.log("Found itinerary saying head back")
+                            console.log("Found itinerary saying head back")
 
-                        for (var wpIndex = 0; wpIndex < actualWayPoints.length; wpIndex++) {
-                            if (checkIfTwoPointsAreTheSame(actualWayPoints[wpIndex], [route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.latitude, route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.longitude])) {
-                                console.log("Found matching way point, removing it")
-                                // Remove the wp since its causing a u turn
-                                directionsManager.removeWaypoint(wpIndex + 1);
+                            for (var wpIndex = 0; wpIndex < actualWayPoints.length; wpIndex++) {
+                                if (checkIfTwoPointsAreTheSame(actualWayPoints[wpIndex], [route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.latitude, route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.longitude])) {
+                                    console.log("Found matching way point, removing it")
+                                    // Remove the wp since its causing a u turn
+                                    directionsManager.removeWaypoint(wpIndex + 1);
 
-                                // Set the element in which the itinerary will be rendered
-                                directionsManager.calculateDirections();
+                                    // Set the element in which the itinerary will be rendered
+                                    directionsManager.calculateDirections();
+
+                                    return;
+                                }
                             }
                         }
                     }
+
                 }
-            }
 
-            // function onGetDirectionsClickFun(directionsEvent) {
-
-            // }
-
-
-
-
-            function loadMapScenario() {
-                var apiKey = 'AIzaSyDhdh1eXucfnK3EytcFAqTd7rt8-y9N7bw';
-
-                map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
-                    credentials: 'AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf',
-                    center: new Microsoft.Maps.Location(47.606209, -122.332071),
-                    zoom: 12
-                });
-
-                Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
-                    directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
-                    // Set Route Mode to walking
+                else {
+                    //Clear any previously calculated directions.
+                    directionsManager.clearAll();                    
                     directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
 
-                    directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
-                    directionsManager.showInputPanel('directionsPanel');
-
-                    // Microsoft.Maps.Events.addHandler(
-                    //   directionsManager,
-                    //   'onGetDirectionsClick',
-                    //   function (directionsEvent)
-                    //   {
-                    //     console.log("YAYAYAYAYYAYA")
-                    //   });
-
-                    Microsoft.Maps.Events.addHandler(
-                      directionsManager,
-                      'directionsUpdated',
-                      directionsUpdatedFunc);
-
                     // the 2 main way points
-                    var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.61526058559883, -122.32351198399039) });
-                    var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.612937373632036, -122.3088754083908)});
+                    // var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.61526058559883, -122.32351198399039) });
+                    // var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.612937373632036, -122.3088754083908)});
+                    var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(startWaypointLocation[0], startWaypointLocation[1]) });
+                    var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(endWaypointLocation[0], endWaypointLocation[1])});
 
                     directionsManager.addWaypoint(waypoint1);
 
-                    var http = new XMLHttpRequest();
-                    var url = "http://127.0.0.1:8000/routeCalc/";
+                    var routeCalcReq = new XMLHttpRequest();
                     var knobs = { "Accessibility": 0.5, "Safety": 1, "Nature": 0.2, "Toilets": 0.1 }
-                    startPoint = [47.61526058559883, -122.32351198399039]
-                    endPoint = [47.612937373632036, -122.3088754083908]
+                    // startPoint = [47.61526058559883, -122.32351198399039]
+                    // endPoint = [47.612937373632036, -122.3088754083908]
+                    startPoint = startWaypointLocation
+                    endPoint = endWaypointLocation
                     
                     var params = {"startLatitude" : startPoint[0],
                                   "startLongitude": startPoint[1],
@@ -143,21 +141,21 @@
                     
                     console.log(params)
                     console.log(JSON.stringify(params))
-                    http.open("POST", url, true);
+                    routeCalcReq.open("POST", routeCalcUrl, true);
 
                     //Send the proper header information along with the request
-                    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    routeCalcReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-                    http.onreadystatechange = function() {//Call a function when the state changes.
-                        if(http.readyState == 4 && http.status == 200) {
+                    routeCalcReq.onreadystatechange = function() {//Call a function when the state changes.
+                        if(routeCalcReq.readyState == 4 && routeCalcReq.status == 200) {
                             var pushpins = [];
 
-                            // console.log(http.responseText);
-                            var viaWaypointsToUse = (JSON.parse(http.responseText)).waypoints
+                            // console.log(routeCalcReq.responseText);
+                            var viaWaypointsToUse = (JSON.parse(routeCalcReq.responseText)).waypoints
 
                             actualWayPoints = []
-                            // console.log(http.responseText);
-                            var snappedData = (JSON.parse(http.responseText));
+                            // console.log(routeCalcReq.responseText);
+                            var snappedData = (JSON.parse(routeCalcReq.responseText));
                             for (var i = 0; i < viaWaypointsToUse.length; i++) {
                                 var latlng = [
                                     viaWaypointsToUse[i].geometry.coordinates[1],
@@ -182,7 +180,7 @@
                                 directionsManager.addWaypoint(viaWayPoint);
                             }
 
-                            var dataPointsToUse = (JSON.parse(http.responseText)).data
+                            var dataPointsToUse = (JSON.parse(routeCalcReq.responseText)).data
                             for (var i = 0; i < dataPointsToUse.length; ++i) {
                                 dp = dataPointsToUse[i];
 
@@ -217,15 +215,54 @@
                             layer.add(pushpins);
                             map.layers.insert(layer);
                             directionsManager.addWaypoint(waypoint2);
-
+            
+                            oldRouteCoords = [startWaypointLocation, endWaypointLocation];
+        
                             // Set the element in which the itinerary will be rendered
                             directionsManager.calculateDirections();
                         }
                     }
                     // console.log(JSON.stringify(params));
-                    http.send(JSON.stringify(params));                        
-                    });
-                
+                    routeCalcReq.send(JSON.stringify(params));     
+                }                
+            }
+
+            // function onGetDirectionsClickFun(directionsEvent) {
+
+            // }
+
+
+
+
+            function loadMapScenario() {
+
+                map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
+                    credentials: bingMapsAPIKey,
+                    center: new Microsoft.Maps.Location(47.606209, -122.332071),
+                    zoom: 12
+                });
+
+                Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
+                    directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+                    // Set Route Mode to walking
+                    directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
+
+                    directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
+                    directionsManager.showInputPanel('directionsPanel');
+
+                    // Microsoft.Maps.Events.addHandler(
+                    //   directionsManager,
+                    //   'onGetDirectionsClick',
+                    //   function (directionsEvent)
+                    //   {
+                    //     console.log("YAYAYAYAYYAYA")
+                    //   });
+
+                    Microsoft.Maps.Events.addHandler(
+                      directionsManager,
+                      'directionsUpdated',
+                      directionsUpdatedFunc);                   
+                });
             }
         </script>
         <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=loadMapScenario' async defer></script>
