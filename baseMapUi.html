@@ -3,44 +3,127 @@
     <head>
         <title>directionsShowAllWaypointsHTML</title>
         <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+        <style>
+        html, body{
+            padding:0;
+            margin:0;
+            height:100%;
+        }
+
+        .directionsContainer{
+            width:380px;
+            height:100%;
+            overflow-y:auto;
+            float:left;
+        }
+
+        #myMap{
+            position:relative;
+            width:calc(100% - 380px);
+            height:100%;
+            float:left;
+        }
+    </style>
     </head>
     <body>
-        <div id='printoutPanel'></div>
+        <div class="directionsContainer">
+            <div id="directionsPanel"></div>
+            <div id="directionsItinerary"></div>
+        </div>
         
-        <div id='myMap' style='width: 100vw; height: 100vh;'></div>
+        <div id='myMap'></div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script type='text/javascript'>
-           
-            // First, checks if it isn't implemented yet.
-            if (!String.prototype.format) {
-              String.prototype.format = function() {
-                var args = arguments;
-                return this.replace(/{(\d+)}/g, function(match, number) { 
-                  return typeof args[number] != 'undefined'
-                    ? args[number]
-                    : match
-                  ;
-                });
-              };
+
+            var map;
+            var directionsManager;
+
+            function getDistanceBetweenTwoPoints(coord1, coord2) {
+                return Math.sqrt(Math.pow(coord1[1] - coord2[1], 2) + Math.pow(coord1[0] - coord2[0], 2))
             }
+
+            function checkIfTwoPointsAreTheSame(coord1, coord2) {
+                return (getDistanceBetweenTwoPoints(coord1, coord2) < 0.0001);
+            }
+
+            function checkIfFormattedItineraryTextSaysTurnBack(formattedItineraryPathText) {
+                stringsIndicatingUTurn = ["turn back", "head back"]
+
+                for (var stringIndicatingUTurnInIndex = 0; stringIndicatingUTurnInIndex < stringsIndicatingUTurn.length; stringIndicatingUTurnInIndex++) {
+                    stringIndicatingUTurn = stringsIndicatingUTurn[stringIndicatingUTurnInIndex];
+                    if(formattedItineraryPathText.toLowerCase().indexOf(stringIndicatingUTurn) != -1) {
+                        return true
+                    }                    
+                }
+
+                return false;
+            }
+
+            function directionsUpdatedFunc(directionsEvent) {
+                var route = directionsManager.getRouteResult();
+
+                console.log(route);
+
+                for (var itineraryLegsIndex = 0; itineraryLegsIndex < route[0].routeLegs[0].itineraryItems.length; itineraryLegsIndex++) {
+                    if ((route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].maneuver === "Unknown") &&
+                        (checkIfFormattedItineraryTextSaysTurnBack(route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].formattedText))) {
+
+                        console.log("Found itinerary saying head back")
+
+                        for (var wpIndex = 0; wpIndex < actualWayPoints.length; wpIndex++) {
+                            if (checkIfTwoPointsAreTheSame(actualWayPoints[wpIndex], [route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.latitude, route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.longitude])) {
+                                console.log("Found matching way point, removing it")
+                                // Remove the wp since its causing a u turn
+                                directionsManager.removeWaypoint(wpIndex + 1);
+
+                                // Set the element in which the itinerary will be rendered
+                                directionsManager.calculateDirections();
+                            }
+                        }
+                    }
+                }
+            }
+
+            // function onGetDirectionsClickFun(directionsEvent) {
+
+            // }
+
+
+
+
             function loadMapScenario() {
                 var apiKey = 'AIzaSyDhdh1eXucfnK3EytcFAqTd7rt8-y9N7bw';
 
-                var map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
+                map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
                     credentials: 'AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf',
                     center: new Microsoft.Maps.Location(47.606209, -122.332071),
                     zoom: 12
                 });
 
                 Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
-                    var directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+                    directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
                     // Set Route Mode to walking
-                    directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking });
+                    directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
+
+                    directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
+                    directionsManager.showInputPanel('directionsPanel');
+
+                    // Microsoft.Maps.Events.addHandler(
+                    //   directionsManager,
+                    //   'onGetDirectionsClick',
+                    //   function (directionsEvent)
+                    //   {
+                    //     console.log("YAYAYAYAYYAYA")
+                    //   });
+
+                    Microsoft.Maps.Events.addHandler(
+                      directionsManager,
+                      'directionsUpdated',
+                      directionsUpdatedFunc);
 
                     // the 2 main way points
                     var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.61526058559883, -122.32351198399039) });
                     var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.612937373632036, -122.3088754083908)});
-
 
                     directionsManager.addWaypoint(waypoint1);
 
@@ -69,20 +152,20 @@
                         if(http.readyState == 4 && http.status == 200) {
                             var pushpins = [];
 
-                            console.log(http.responseText);
+                            // console.log(http.responseText);
                             var viaWaypointsToUse = (JSON.parse(http.responseText)).waypoints
 
                             actualWayPoints = []
-                            console.log(http.responseText);
+                            // console.log(http.responseText);
                             var snappedData = (JSON.parse(http.responseText));
-                            for (var i = 1; i < viaWaypointsToUse.length - 1; i++) {
+                            for (var i = 0; i < viaWaypointsToUse.length; i++) {
                                 var latlng = [
                                     viaWaypointsToUse[i].geometry.coordinates[1],
                                     viaWaypointsToUse[i].geometry.coordinates[0]];
                                 actualWayPoints.push(latlng);
                             }
 
-                            console.log(actualWayPoints)
+                            // console.log(actualWayPoints)
 
                             for (var i = 0; i < actualWayPoints.length; ++i) {
                                 var actualWayPoint = actualWayPoints[i]
@@ -136,11 +219,10 @@
                             directionsManager.addWaypoint(waypoint2);
 
                             // Set the element in which the itinerary will be rendered
-                            directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
                             directionsManager.calculateDirections();
                         }
                     }
-                    console.log(JSON.stringify(params));
+                    // console.log(JSON.stringify(params));
                     http.send(JSON.stringify(params));                        
                     });
                 
