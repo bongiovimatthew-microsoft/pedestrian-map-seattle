@@ -72,7 +72,6 @@ function CalculateWaypoints(dataPoints, res){
     console.log("Starting CalculateWaypoints");
     
     var bbox = turf.bbox(dataPoints);
-    var units = 'miles';
 
     var from = {
       "type": "Feature",
@@ -93,13 +92,17 @@ function CalculateWaypoints(dataPoints, res){
       }
     };
 
-    console.log("Having bounding box, working on square grid");
+    console.log("Have bounding box, working on square grid");
     
-    var distance = turf.distance(from, to, units);
-    var cellSize = distance / 5 
+    // var units = 'miles';
+    var units = 'feet';
+    // var distance = turf.distance(from, to, units);
+    // var cellSize = distance / 5 
+    var cellSize = 300;
     //console.log(cellSize)
     var squareGrid = turf.squareGrid(bbox, cellSize, units);
 
+    console.log(squareGrid);
     console.log("Have square grid, working on collect");
     
     // Collect the 'score' property from each squareGrid cell, and attach it as the 'values' array to each squareGrid cell 
@@ -125,8 +128,23 @@ function CalculateWaypoints(dataPoints, res){
     
     // Sort the collected set by polygon area, from smallest to largest
     var sortedGrid = collected.features.sort(compare); 
-    //console.log(sortedGrid) 
+    console.log(sortedGrid) 
 
+    // Starting from the start point, walk towards the end point 
+    //  using greedy select 
+
+    // 1. Select cell with source point as curr_cell
+    // 2. Find all adjacent cells to curr_cell and put them in active_cell_list 
+    // 3. Calculate cost of all cells in active_cell_list by: 
+    //         1. Horizontal Cost = (C1 + C2)/2 
+    //         2. Diag Cost = sqrt(2)/2 * (C1 + C2) 
+    // 4. Update cell costs 
+    // 5. Check if destination point is in active_cell_list, if so, stop
+    // 6. Select lowest cost cell as curr_cell, loop to 2
+
+
+
+    // Take the top five best scores from the sorted grid, and use their centroid as the waypoints
     waypoints = []
     waypointObjs = [] 
     for(i = 0; i < 5; i++){
