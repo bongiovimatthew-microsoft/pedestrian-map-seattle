@@ -22,13 +22,19 @@ def wayPointsSortKeyFunc(startPoint, wayPoint1):
 def getDistanceBetweenTwoPoints(point1, point2):
     return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
 
-def getNodeJSWayPoints(allData):
+def getNodeJSWayPoints(allData, boundingBox):
     # Make request to node.js endpoint 
     fullUrl = "https://waypointcalc.herokuapp.com/" 
     safe = '$\':'
     urlEncodedData = urllib.parse.quote(str(allData), safe = safe).encode('utf8')
     
-    postBody = { "data": allData }
+    postBody = { "data": allData,
+                 "startLatitude": boundingBox[0][0],
+                 "startLongitude": boundingBox[0][1],
+                 "endLatitude": boundingBox[1][0],
+                 "endLongitude": boundingBox[1][1] 
+               }
+
     print(postBody)
     
     req = urllib.request.Request(fullUrl)
@@ -129,16 +135,38 @@ def RouteCalcCore(request):
     requestDict = json.loads(str(request.body.decode('utf-8')))
     
     dateRange = ""
-    boundingBox = ((requestDict['startLatitude'] - 0.005, requestDict['startLongitude'] - 0.005), (requestDict['endLatitude'] + 0.005, requestDict['endLongitude'] + 0.005))
+
+    startLatitude = requestDict['startLatitude']
+    startLongitude = requestDict['startLongitude']
+    endLatitude = requestDict['endLatitude']
+    endLongitude = requestDict['endLongitude']
+
+    if requestDict['startLatitude'] < requestDict['endLatitude']:
+        startLatitude -= 0.005
+        endLatitude += 0.005
+    else:
+        startLatitude += 0.005
+        endLatitude -= 0.005
+
+    if requestDict['startLongitude'] < requestDict['endLongitude']:
+        startLongitude -= 0.005
+        endLongitude += 0.005
+    else:
+        startLongitude += 0.005
+        endLongitude -= 0.005
+
+    boundingBox = ((startLatitude, startLongitude), (endLatitude, endLongitude))
     knobWeights = requestDict['knobWeights']
 
     startPointCoord = [requestDict['startLatitude'], requestDict['startLongitude']]
     endPointCoord = [requestDict['endLatitude'], requestDict['endLongitude']]
 
     allData = aggregator.GetAllCleanData(dateRange, boundingBox, knobWeights)    
+
+    print(boundingBox)
     print(allData)
 
-    wayPointCalcResponseStr = getNodeJSWayPoints(allData)
+    wayPointCalcResponseStr = getNodeJSWayPoints(allData, boundingBox)
     print(wayPointCalcResponseStr)
 
     wayPointsReceived = json.loads(wayPointCalcResponseStr)

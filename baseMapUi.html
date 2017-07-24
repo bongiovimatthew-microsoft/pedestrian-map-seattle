@@ -198,6 +198,7 @@
 
                             // console.log(routeCalcReq.responseText);
                             var viaWaypointsToUse = (JSON.parse(routeCalcReq.responseText)).waypoints
+                            console.log(viaWaypointsToUse)
 
                             actualWayPoints = []
                             // console.log(routeCalcReq.responseText);
@@ -235,17 +236,17 @@
 
                                 var color = 'green'
                                 if (dp["properties"]["knob"] == "Accessibility") {
-                                    color = 'green';
+                                    color = 'blue';
                                 }
                                 else if (dp["properties"]["knob"] == "Safety") {
-                                    color = 'yellow';
+                                    color = 'orange';
                                 }
 
                                 else if (dp["properties"]["knob"] == "Nature") {
-                                    color = 'blue';
+                                    color = 'green';
                                 }
                                 else if (dp["properties"]["knob"] == "Toilets") {
-                                    color = 'orange';
+                                    color = 'yellow';
                                 }
 
                                 var pin = new Microsoft.Maps.Pushpin(pointLoc, {
