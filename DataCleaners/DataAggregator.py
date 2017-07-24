@@ -50,6 +50,8 @@ class DataAggregator():
                 # Scale point weight by weight of data wrt to a knob
                 point['properties']['score'] = float(point['properties']['score']) * cleaner[2]
 
+                point['properties']['knob'] = cleaner[1] 
+
                 # Scale point weight by weight of knob for this call
                 # issue-manigu-06112017 what should we do in the case that we dont have this passed to us?
                 if cleaner[1] in knobWeights.keys():
