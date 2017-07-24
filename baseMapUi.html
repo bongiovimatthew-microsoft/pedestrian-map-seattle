@@ -180,7 +180,7 @@
                     var params = {"startLatitude" : startPoint[0],
                                   "startLongitude": startPoint[1],
                                   "endLatitude": endPoint[0] ,
-                                  "endLongitude": endPoint[1] + 0.005,
+                                  "endLongitude": endPoint[1],
                                   "knobWeights": knobs,
                                   "includeData": 1
                                   }
@@ -241,7 +241,6 @@
                                 else if (dp["properties"]["knob"] == "Safety") {
                                     color = 'orange';
                                 }
-
                                 else if (dp["properties"]["knob"] == "Nature") {
                                     color = 'green';
                                 }
