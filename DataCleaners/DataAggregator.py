@@ -11,7 +11,7 @@ class DataAggregator():
         #  right now it's a list of tupples, where 0 is the data set name, 1 is knob it affects
         #  2 is the weight of that set wrt to the knob, bounding box for data set?
         self.allCleaners = [
-        ('Seattle911Cleaner', 'Safety', 1),
+        ('Seattle911Cleaner', 'Safety', -1),
         ('SeattleAccessibilityCleaner', 'Accessibility', 1),
         ('SeattleNatureCleaner', 'Nature', 1),
         ('SeattlePublicToiletsCleaner', 'Toilets', 1)
