@@ -49,6 +49,24 @@
                 return (getDistanceBetweenTwoPoints(coord1, coord2) < 0.0001);
             }
 
+            function indexOfMin(arr) {
+                if (arr.length === 0) {
+                    return -1;
+                }
+
+                var min = arr[0];
+                var minIndex = 0;
+
+                for (var i = 1; i < arr.length; i++) {
+                    if (arr[i] > min) {
+                        minIndex = i;
+                        min = arr[i];
+                    }
+                }
+
+                return minIndex;
+            }
+
             function checkIfFormattedItineraryTextSaysTurnBack(formattedItineraryPathText) {
                 stringsIndicatingUTurn = ["turn back", "head back"]
 
@@ -97,15 +115,43 @@
                             for (var wpIndex = 0; wpIndex < actualWayPoints.length; wpIndex++) {
                                 if (checkIfTwoPointsAreTheSame(actualWayPoints[wpIndex], [route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.latitude, route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.longitude])) {
                                     console.log("Found matching way point, removing it")
+                                    console.log(wpIndex)
                                     // Remove the wp since its causing a u turn
                                     directionsManager.removeWaypoint(wpIndex + 1);
 
                                     // Set the element in which the itinerary will be rendered
                                     directionsManager.calculateDirections();
+                                    actualWayPoints.splice(wpIndex, 1)
 
                                     return;
                                 }
                             }
+
+                            // None of the way points match exactly so find the closest and kill that one
+                            distToWayPoints = []
+                            for (var wpIndex = 0; wpIndex < actualWayPoints.length; wpIndex++) {
+                                distToWayPoints.push((getDistanceBetweenTwoPoints(actualWayPoints[wpIndex], [route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.latitude, route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.longitude])))
+
+                            }
+
+                            var minDistIndex = indexOfMin(distToWayPoints)
+                            if (-1 === minDistIndex) {
+                                return;
+                            }
+
+                            console.log("Removing waypoint closest to turn back")
+                            console.log(minDistIndex)
+
+                            actualWayPoints.splice(minDistIndex, 1)
+
+                            // Remove the wp since its causing a u turn
+                            directionsManager.removeWaypoint(minDistIndex + 1);
+
+                            // Set the element in which the itinerary will be rendered
+                            directionsManager.calculateDirections();
+
+                            return;
+
                         }
                     }
 
@@ -197,9 +243,7 @@
 
                                 else if (dp["properties"]["knob"] == "Nature") {
                                     color = 'blue';
-
                                 }
-
                                 else if (dp["properties"]["knob"] == "Toilets") {
                                     color = 'orange';
                                 }
