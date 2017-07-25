@@ -41,6 +41,37 @@ function checkIfFormattedItineraryTextSaysTurnBack(formattedItineraryPathText) {
     return false;
 }
 
+function ClearAndResetRouteData(){
+	// Clear any previously calculated directions.
+    directionsManager.clearAll();
+    directionsManager.dispose();
+
+    // directionsManager.clearDisplay();
+    // var allWaypointsCache = directionsManager.getAllWaypoints();
+    // for(var i = 0; i < directionsManager.getAllWaypoints().length; i++){
+    // 	console.log("Length: " + directionsManager.getAllWaypoints().length);
+    // 	console.log("Removing waypoint index: " + i);
+    // 	directionsManager.removeWaypoint(allWaypointsCache[i]);
+    // }
+    
+    // Reset the options that we want on directionsManager
+    //directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
+    //directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
+    //directionsManager.showInputPanel('directionsPanel');
+
+	directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+        
+    // Set Route Mode to walking
+    directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
+    directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
+    directionsManager.showInputPanel('directionsPanel');
+    
+    Microsoft.Maps.Events.addHandler(
+      directionsManager,
+      'directionsUpdated',
+      directionsUpdatedFunc);
+}
+
 function CalculateDirectionsForNewRoute(route, startWaypointLocation, endWaypointLocation){
     console.log("Enter: CalculateDirectionsForNewRoute");
 	
@@ -49,21 +80,7 @@ function CalculateDirectionsForNewRoute(route, startWaypointLocation, endWaypoin
 	console.log("startWaypointLocation: " + startWaypointLocation);
 	console.log("endWaypointLocation: " + endWaypointLocation);
 	
-    // Clear any previously calculated directions.
-    // directionsManager.clearAll();
-
-    directionsManager.clearDisplay();
-
-    for(var i = 0; i < directionsManager.getAllWaypoints().length; i++){
-    	console.log("Length: " + directionsManager.getAllWaypoints().length);
-    	console.log("Removing waypoint index: " + i);
-    	directionsManager.removeWaypoint(directionsManager.getAllWaypoints()[i]);
-    }
-        
-    // Reset the options that we want on directionsManager
-    //directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
-    //directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
-    //directionsManager.showInputPanel('directionsPanel');
+	ClearAndResetRouteData();
 
     // Create waypoints, and add them to directionsManager
     var startWaypoint = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(startWaypointLocation[0], startWaypointLocation[1]) });
