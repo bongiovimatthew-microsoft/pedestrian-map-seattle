@@ -202,8 +202,13 @@ function GreedySelectWaypoints(squareGrid, startPoint, endPoint, minValue, maxVa
 
         pathCellsArray.unshift(curr_node);
 
-        curr_node_val = curr_node.predecessor;
-        curr_node = shortDistances[curr_node.predecessor];
+        if(curr_node.predecessor){
+            curr_node_val = curr_node.predecessor;
+            curr_node = shortDistances[curr_node_val];
+        }else{
+            console.log("The current node does not have a predecessor.");
+            break;
+        }        
     }
 
     console.log("Done doing the shortest path calculations!");
