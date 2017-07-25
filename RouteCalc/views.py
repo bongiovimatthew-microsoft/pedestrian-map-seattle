@@ -22,17 +22,17 @@ def wayPointsSortKeyFunc(startPoint, wayPoint1):
 def getDistanceBetweenTwoPoints(point1, point2):
     return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
 
-def getNodeJSWayPoints(allData, boundingBox):
+def getNodeJSWayPoints(allData, startEndCoords):
     # Make request to node.js endpoint 
-    fullUrl = "https://waypointcalc.herokuapp.com/" 
+    fullUrl = "http://127.0.0.1:5000/" 
     safe = '$\':'
     urlEncodedData = urllib.parse.quote(str(allData), safe = safe).encode('utf8')
     
     postBody = { "data": allData,
-                 "startLatitude": boundingBox[0][0],
-                 "startLongitude": boundingBox[0][1],
-                 "endLatitude": boundingBox[1][0],
-                 "endLongitude": boundingBox[1][1] 
+                 "startLatitude": startEndCoords[0][0],
+                 "startLongitude": startEndCoords[0][1],
+                 "endLatitude": startEndCoords[1][0],
+                 "endLongitude": startEndCoords[1][1] 
                }
 
     print(postBody)
@@ -156,6 +156,7 @@ def RouteCalcCore(request):
         endLongitude -= 0.005
 
     boundingBox = ((startLatitude, startLongitude), (endLatitude, endLongitude))
+    actualcoords = ((requestDict['startLatitude'], requestDict['startLongitude']), (requestDict['endLatitude'], requestDict['endLongitude']))
     knobWeights = requestDict['knobWeights']
 
     startPointCoord = [requestDict['startLatitude'], requestDict['startLongitude']]
@@ -166,7 +167,7 @@ def RouteCalcCore(request):
     print(boundingBox)
     print(allData)
 
-    wayPointCalcResponseStr = getNodeJSWayPoints(allData, boundingBox)
+    wayPointCalcResponseStr = getNodeJSWayPoints(allData, [startPointCoord, endPointCoord])
     print(wayPointCalcResponseStr)
 
     wayPointsReceived = json.loads(wayPointCalcResponseStr)
