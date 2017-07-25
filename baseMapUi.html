@@ -1,315 +1,89 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>CityPulse</title>
-        <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
-        <style>
-        html, body{
-            padding:0;
-            margin:0;
-            height:100%;
-        }
 
-        .directionsContainer{
-            width:380px;
-            height:100%;
-            overflow-y:auto;
-            float:left;
-        }
+<head>
+    <title>CityPulse</title>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <link rel="stylesheet" href="baseMapUi.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">    
+</head>
 
-        #myMap{
-            position:relative;
-            width:calc(100% - 380px);
-            height:100%;
-            float:left;
-        }
-    </style>
-    </head>
-    <body>
-        <div class="directionsContainer">
-            <div id="directionsPanel"></div>
-            <div id="directionsItinerary"></div>
+<body>
+    <div class="directionsContainer">
+        <div class="page-header">
+            <img src="http://seattlecitypulse.com/images/CityPulseHeader.png">
         </div>
-        
-        <div id='myMap'></div>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <script type='text/javascript'>
+        <div id="directionsPanel"></div>
+        <div id="directionsItinerary"></div>
+        <div>
+            <div class="toggle-switch-container">
+                <div class="row padding-left">
+                    <div class="col-md-3" >
+                        <label>Pedestrian Safety</label>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="switch switch-control">
+                    <input type="checkbox" id="safety-switch">
+                    <span class="slider round"></span>
+                </label>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Accessibility        </label>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="switch switch-control">
+                    <input type="checkbox" id="accessibility-switch">
+                    <span class="slider round"></span>
+                </label>
+                    </div>
+                </div>
 
-            var map;
-            var directionsManager;
-            var bingMapsAPIKey = 'AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf';
-            var routeCalcUrl = "https://routecalculator.herokuapp.com/routeCalc/";
-            // var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
+                <div class="row padding-left">
+                    <div class="col-md-3">
+                        <label>Nature</label>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="switch switch-control">
+                            <input type="checkbox" id="nature-switch">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Public Toilets</label>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="switch switch-control">
+                        <input type="checkbox" id="toilet-switch">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <br>
+                <div class="row padding-left">
+                    <div class="col-md-3">
+                        <label>Show Data (Demo)</label>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="switch switch-control">
+                            <input type="checkbox" id="show-data-switch">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>                    
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
 
-            var oldRouteCoords = [];
+    <div id='myMap'></div>
+    <script src="baseMapUi.js"></script>
+    <!-- <script src="https://assets.onestore.ms/cdnfiles/external/webcore/4.19.0/scripts/bootstrap.js "></script> -->
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?branch=experimental&callback=loadMapScenario' async defer></script>
+</body>
 
-            function getDistanceBetweenTwoPoints(coord1, coord2) {
-                return Math.sqrt(Math.pow(coord1[1] - coord2[1], 2) + Math.pow(coord1[0] - coord2[0], 2))
-            }
-
-            function checkIfTwoPointsAreTheSame(coord1, coord2) {
-                return (getDistanceBetweenTwoPoints(coord1, coord2) < 0.0001);
-            }
-
-            function indexOfMin(arr) {
-                if (arr.length === 0) {
-                    return -1;
-                }
-
-                var min = arr[0];
-                var minIndex = 0;
-
-                for (var i = 1; i < arr.length; i++) {
-                    if (arr[i] < min) {
-                        minIndex = i;
-                        min = arr[i];
-                    }
-                }
-
-                return minIndex;
-            }
-
-            function checkIfFormattedItineraryTextSaysTurnBack(formattedItineraryPathText) {
-                stringsIndicatingUTurn = ["turn back", "head back"]
-
-                for (var stringIndicatingUTurnInIndex = 0; stringIndicatingUTurnInIndex < stringsIndicatingUTurn.length; stringIndicatingUTurnInIndex++) {
-                    stringIndicatingUTurn = stringsIndicatingUTurn[stringIndicatingUTurnInIndex];
-                    if(formattedItineraryPathText.toLowerCase().indexOf(stringIndicatingUTurn) != -1) {
-                        return true
-                    }                    
-                }
-
-                return false;
-            }
-
-            function directionsUpdatedFunc(directionsEvent) {
-                var startWaypointLocation = [directionsEvent.route[0].routeLegs[0].startWaypointLocation.latitude, directionsEvent.route[0].routeLegs[0].startWaypointLocation.longitude]
-                var endWaypointLocation = [directionsEvent.route[0].routeLegs[0].endWaypointLocation.latitude, directionsEvent.route[0].routeLegs[0].endWaypointLocation.longitude]
-                var currentRouteCoords = [startWaypointLocation, endWaypointLocation];
-
-                console.log(directionsEvent);
-                var route = directionsManager.getRouteResult();
-                var newRoute = false;
-
-                if (oldRouteCoords.length != currentRouteCoords.length) {
-                    newRoute = true;
-                }
-                else {
-                    if (checkIfTwoPointsAreTheSame(oldRouteCoords[0], currentRouteCoords[0]) &&
-                        checkIfTwoPointsAreTheSame(oldRouteCoords[1], currentRouteCoords[1])) {
-                        newRoute = false;
-                    }
-                    else {
-                        newRoute = true;
-                    }
-                }
-
-                console.log(route);
-                console.log(newRoute);
-
-                if (! newRoute) {
-                    for (var itineraryLegsIndex = 0; itineraryLegsIndex < route[0].routeLegs[0].itineraryItems.length; itineraryLegsIndex++) {
-                        if ((route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].maneuver === "Unknown") &&
-                            (checkIfFormattedItineraryTextSaysTurnBack(route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].formattedText))) {
-
-                            console.log("Found itinerary saying head back")
-
-                            for (var wpIndex = 0; wpIndex < actualWayPoints.length; wpIndex++) {
-                                if (checkIfTwoPointsAreTheSame(actualWayPoints[wpIndex], [route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.latitude, route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.longitude])) {
-                                    console.log("Found matching way point, removing it")
-                                    console.log(wpIndex)
-                                    // Remove the wp since its causing a u turn
-                                    directionsManager.removeWaypoint(wpIndex + 1);
-                                    // Set the element in which the itinerary will be rendered
-                                    directionsManager.calculateDirections();
-                                    actualWayPoints.splice(wpIndex, 1)
-
-                                    return;
-                                }
-                            }
-
-                            // None of the way points match exactly so find the closest and kill that one
-                            distToWayPoints = []
-                            for (var wpIndex = 0; wpIndex < actualWayPoints.length; wpIndex++) {
-                                distToWayPoints.push((getDistanceBetweenTwoPoints(actualWayPoints[wpIndex], [route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.latitude, route[0].routeLegs[0].itineraryItems[itineraryLegsIndex].coordinate.longitude])))
-
-                            }
-
-                            var minDistIndex = indexOfMin(distToWayPoints)
-                            if (-1 === minDistIndex) {
-                                return;
-                            }
-
-                            console.log("Removing waypoint closest to turn back")
-                            console.log(minDistIndex)
-
-                            actualWayPoints.splice(minDistIndex, 1)
-
-                            // Remove the wp since its causing a u turn
-                            directionsManager.removeWaypoint(minDistIndex + 1);
-
-                            // Set the element in which the itinerary will be rendered
-                            directionsManager.calculateDirections();
-
-                            return;
-
-                        }
-                    }
-
-                }
-
-                else {
-                    //Clear any previously calculated directions.
-                    directionsManager.clearAll();                    
-                    directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
-
-                    // the 2 main way points
-                    // var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.61526058559883, -122.32351198399039) });
-                    // var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(47.612937373632036, -122.3088754083908)});
-                    var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(startWaypointLocation[0], startWaypointLocation[1]) });
-                    var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(endWaypointLocation[0], endWaypointLocation[1])});
-
-                    directionsManager.addWaypoint(waypoint1);
-
-                    var routeCalcReq = new XMLHttpRequest();
-                    var knobs = { "Accessibility": 0.5, "Safety": 1, "Nature": 0.2, "Toilets": 0.1 }
-                    // startPoint = [47.61526058559883, -122.32351198399039]
-                    // endPoint = [47.612937373632036, -122.3088754083908]
-                    startPoint = startWaypointLocation
-                    endPoint = endWaypointLocation
-                    
-                    var params = {"startLatitude" : startPoint[0],
-                                  "startLongitude": startPoint[1],
-                                  "endLatitude": endPoint[0] ,
-                                  "endLongitude": endPoint[1],
-                                  "knobWeights": knobs,
-                                  "includeData": 1
-                                  }
-                    
-                    console.log(params)
-                    console.log(JSON.stringify(params))
-                    routeCalcReq.open("POST", routeCalcUrl, true);
-
-                    //Send the proper header information along with the request
-                    routeCalcReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-                    routeCalcReq.onreadystatechange = function() {//Call a function when the state changes.
-                        if(routeCalcReq.readyState == 4 && routeCalcReq.status == 200) {
-                            var pushpins = [];
-
-                            // console.log(routeCalcReq.responseText);
-                            var viaWaypointsToUse = (JSON.parse(routeCalcReq.responseText)).waypoints
-                            console.log(viaWaypointsToUse)
-
-                            actualWayPoints = []
-                            // console.log(routeCalcReq.responseText);
-                            var snappedData = (JSON.parse(routeCalcReq.responseText));
-                            for (var i = 0; i < viaWaypointsToUse.length; i++) {
-                                var latlng = [
-                                    viaWaypointsToUse[i].geometry.coordinates[1],
-                                    viaWaypointsToUse[i].geometry.coordinates[0]];
-                                actualWayPoints.push(latlng);
-                            }
-
-                            // console.log(actualWayPoints)
-
-                            for (var i = 0; i < actualWayPoints.length; ++i) {
-                                var actualWayPoint = actualWayPoints[i]
-
-                                //Create custom Pushpin
-                                var pointLoc = new Microsoft.Maps.Location(actualWayPoint[0], actualWayPoint[1]);
-                                var pin = new Microsoft.Maps.Pushpin(pointLoc, {
-                                    color: 'red'
-                                });
-                                pushpins.push(pin)
-
-                                // create the via point to add to the direction manager
-                                var viaWayPoint = new Microsoft.Maps.Directions.Waypoint({ location: pointLoc, isViaPoint: true });
-                                directionsManager.addWaypoint(viaWayPoint);
-                            }
-
-                            var dataPointsToUse = (JSON.parse(routeCalcReq.responseText)).data
-                            for (var i = 0; i < dataPointsToUse.length; ++i) {
-                                dp = dataPointsToUse[i];
-
-                                //Create custom Pushpin
-                                var pointLoc = new Microsoft.Maps.Location(dp["geometry"]["coordinates"][1], dp["geometry"]["coordinates"][0]);
-
-                                var color = 'green'
-                                if (dp["properties"]["knob"] == "Accessibility") {
-                                    color = 'blue';
-                                }
-                                else if (dp["properties"]["knob"] == "Safety") {
-                                    color = 'orange';
-                                }
-                                else if (dp["properties"]["knob"] == "Nature") {
-                                    color = 'green';
-                                }
-                                else if (dp["properties"]["knob"] == "Toilets") {
-                                    color = 'yellow';
-                                }
-
-                                var pin = new Microsoft.Maps.Pushpin(pointLoc, {
-                                    color: color
-                                });
-                                pushpins.push(pin)
-                            }
-
-                            // add the pushpins data
-                            var layer = new Microsoft.Maps.Layer();
-                            layer.add(pushpins);
-                            map.layers.insert(layer);
-                            directionsManager.addWaypoint(waypoint2);
-            
-                            oldRouteCoords = [startWaypointLocation, endWaypointLocation];
-        
-                            // Set the element in which the itinerary will be rendered
-                            directionsManager.calculateDirections();
-                        }
-                    }
-                    // console.log(JSON.stringify(params));
-                    routeCalcReq.send(JSON.stringify(params));     
-                }                
-            }
-
-            // function onGetDirectionsClickFun(directionsEvent) {
-
-            // }
-
-
-
-
-            function loadMapScenario() {
-
-                map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
-                    credentials: bingMapsAPIKey,
-                    center: new Microsoft.Maps.Location(47.606209, -122.332071),
-                    zoom: 12
-                });
-
-                Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
-                    directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
-                    // Set Route Mode to walking
-                    directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
-
-                    directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
-                    directionsManager.showInputPanel('directionsPanel');
-
-                    // Microsoft.Maps.Events.addHandler(
-                    //   directionsManager,
-                    //   'onGetDirectionsClick',
-                    //   function (directionsEvent)
-                    //   {
-                    //     console.log("YAYAYAYAYYAYA")
-                    //   });
-
-                    Microsoft.Maps.Events.addHandler(
-                      directionsManager,
-                      'directionsUpdated',
-                      directionsUpdatedFunc);                   
-                });
-            }
-        </script>
-        <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=loadMapScenario' async defer></script>
-    </body>
 </html>
