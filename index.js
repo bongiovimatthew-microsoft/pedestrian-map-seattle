@@ -90,8 +90,6 @@ function CreateCostMatrixFromGrid(squareGrid, startPoint, endPoint){
         }
         
         var curr_long = squareGrid.features[i].geometry.coordinates[0][0][0]; 
-        console.log(curr_long)   
-        console.log(last_long)
         if (curr_long != last_long){
             row_count++;            
             col_count = 0;
@@ -105,6 +103,7 @@ function CreateCostMatrixFromGrid(squareGrid, startPoint, endPoint){
         // Add the cell score to the current (row, col) entry 
         costMatrix[row_count].push([squareGrid.features[i].properties.totalScore, i]);
 
+        // console.log("index, score ", i, squareGrid.features[i].properties.totalScore);
         if(turf.inside(startPointFeature, squareGrid.features[i])){
             // Mark the (row, col) index of the start point 
             startCellIndex = i;
@@ -137,8 +136,12 @@ function isValidIndex(row, col, costMatrix){
 
     return false;
 }
+function weightFn(e, minValue, maxValue, g) {
+    var tempVal = g.edge(e).weight - minValue;
 
-function GreedySelectWaypoints(squareGrid, startPoint, endPoint, minValue){
+    return (Math.abs(maxValue - minValue)) - tempVal;
+}
+function GreedySelectWaypoints(squareGrid, startPoint, endPoint, minValue, maxValue){
     // Use Dijkstra's to do shortest path 
 
     // 1. Build cost matrix from squareGrid
@@ -181,7 +184,9 @@ function GreedySelectWaypoints(squareGrid, startPoint, endPoint, minValue){
             }            
         }
     }
-    var shortDistances = alg.dijkstra(g, costMatrixData.startCellIndex, function(e){ return g.edge(e).weight - minValue });  
+    console.log("minValue: " + minValue)
+    console.log("maxValue: " + maxValue)
+    var shortDistances = alg.dijkstra(g, costMatrixData.startCellIndex, function(e) { return weightFn(e, minValue, maxValue, g) });  
 
     var max = 1000000;
     var i = 0;
@@ -211,7 +216,8 @@ function GreedySelectWaypoints(squareGrid, startPoint, endPoint, minValue){
     waypointsToReturn = [];
     for(var i = 0; i < pathCellsArray.length; i += wayPointStep){
         var nodeIndex = pathCellsArray[i].predecessor;
-        var waypointCellCenter = turf.centroid(squareGrid.features[nodeIndex]);
+        // var waypointCellCenter = turf.centroid(squareGrid.features[nodeIndex]);
+        var waypointCellCenter = turf.point(squareGrid.features[nodeIndex].geometry.coordinates[0][3]);
         waypointsToReturn.push(waypointCellCenter);
     }
 
@@ -242,13 +248,25 @@ function CalculateWaypoints(postBody, res){
     var collected = turf.collect(squareGrid, dataPoints, 'score', 'values');
 
     // Iterate throug each cell and add all the collected 'values' property together 
-    var minValue = 0;
+    var minValue =  1000000;
+    var maxValue = -1000000;
+
+    var avgScore = 0;
+    var sumScore = 0;
     for(i = 0; i < collected.features.length; i++){
         collected.features[i].properties.totalScore =  collected.features[i].properties.values.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        sumScore += collected.features[i].properties.totalScore;
+
         if(collected.features[i].properties.totalScore < minValue){
             minValue = collected.features[i].properties.totalScore;
         }
+        if(collected.features[i].properties.totalScore > maxValue){
+            maxValue = collected.features[i].properties.totalScore;
+        }
     }
+    avgScore = sumScore / collected.features.length
+
+    console.log("avgScore: " + avgScore)
 
     // Define a compare function to compare polygons by score, from largest to smallest 
     function compare(a,b) {
@@ -263,7 +281,7 @@ function CalculateWaypoints(postBody, res){
     var endPoint = [postBody.endLongitude, postBody.endLatitude];
     
     console.log("About to start GreedySelectWaypoints");
-    var waypoints = GreedySelectWaypoints(collected, startPoint, endPoint, minValue);
+    var waypoints = GreedySelectWaypoints(collected, startPoint, endPoint, minValue, maxValue);
     console.log("GreedySelectWaypoints is done");
 
     // Pick waypoints from path cells 
