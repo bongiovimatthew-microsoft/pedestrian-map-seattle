@@ -39,6 +39,8 @@
             var directionsManager;
             var bingMapsAPIKey = 'AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf';
             var routeCalcUrl = "https://routecalculator.herokuapp.com/routeCalc/";
+            // var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
+
             var oldRouteCoords = [];
 
             function getDistanceBetweenTwoPoints(coord1, coord2) {
@@ -58,7 +60,7 @@
                 var minIndex = 0;
 
                 for (var i = 1; i < arr.length; i++) {
-                    if (arr[i] > min) {
+                    if (arr[i] < min) {
                         minIndex = i;
                         min = arr[i];
                     }
@@ -118,7 +120,6 @@
                                     console.log(wpIndex)
                                     // Remove the wp since its causing a u turn
                                     directionsManager.removeWaypoint(wpIndex + 1);
-
                                     // Set the element in which the itinerary will be rendered
                                     directionsManager.calculateDirections();
                                     actualWayPoints.splice(wpIndex, 1)
