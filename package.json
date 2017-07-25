@@ -21,7 +21,8 @@
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "forever": "^0.15.3",
-    "forever-monitor": "^1.7.1"
+    "forever-monitor": "^1.7.1",
+    "graphlib": "^2.1.1"
   },
   "engines": {
     "node": "6.11.1"
