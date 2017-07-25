@@ -3,7 +3,8 @@ var turf = require('./turf.min.js');
 var url = require('url');
 var express = require('express');
 var bodyParser = require('body-parser');
-var Graph = require("graphlib").Graph;
+var Graph = require('graphlib').Graph;
+var alg = require('graphlib').alg;
 
 var app = express();
 
@@ -70,43 +71,48 @@ app.listen(app.get('port'), function() {
 });
 
 function CreateCostMatrixFromGrid(squareGrid, startPoint, endPoint){
-    var costMatrix = [];
+    var costMatrix = [[]];
 
     var col_count = 0;
     var row_count = 0;
-    var last_lat = 0;
+    var last_long = 0;
 
     var startPointFeature = turf.point(startPoint);
     var endPointFeature = turf.point(endPoint);
 
     var startCellIndex = [];
     var endCellIndex = [];
-    
+
     for (var i = 0; i < squareGrid.features.length; i++){
 
         if (i > 0){
-            last_lat = squareGrid.features[i - 1].geometry[0];    
+            last_long = squareGrid.features[i - 1].geometry.coordinates[0][0][0];    
         }
         
-        var curr_lat = squareGrid.features[i].geometry[0];    
-        if (curr_lat != last_lat){
-            // We have just moved from the first column to the second 
-            col_count++; 
-            row_count = 0;
-        }else{
+        var curr_long = squareGrid.features[i].geometry.coordinates[0][0][0]; 
+        console.log(curr_long)   
+        console.log(last_long)
+        if (curr_long != last_long){
             row_count++;            
+            col_count = 0;
+            costMatrix.push([])
+
+            // We have just moved from the first column to the second 
+        }else{
+            col_count++; 
         }
     
         // Add the cell score to the current (row, col) entry 
-        costMatrix[row_count][col_count] = [squareGrid.features[i].properties.totalScore, i];
+        costMatrix[row_count].push([squareGrid.features[i].properties.totalScore, i]);
+
         if(turf.inside(startPointFeature, squareGrid.features[i])){
             // Mark the (row, col) index of the start point 
-            startCellIndex = [row_count, col_count];
+            startCellIndex = i;
         }
     
         if(turf.inside(endPointFeature, squareGrid.features[i])){
             // Mark the (row, col) index of the end point 
-            endCellIndex = [row_count, col_count];
+            endCellIndex = i;
         }
 
     }
@@ -121,6 +127,10 @@ function GetGridIndexFromCostMatrix(row, col, costMatrix){
 }
 
 function isValidIndex(row, col, costMatrix){
+    if(! costMatrix[row]) {
+        return false;
+    }
+
     if(costMatrix[row][col]){
         return true;
     }
@@ -135,58 +145,80 @@ function GreedySelectWaypoints(squareGrid, startPoint, endPoint){
     var costMatrixData = CreateCostMatrixFromGrid(squareGrid, startPoint, endPoint);
     var costMatrix = costMatrixData.costMatrix;
 
+
+    console.log(costMatrixData)
     // Create a new directed graph
     var g = new Graph();
 
     // Build graph from costMatrix 
     for(var row = 0; row < costMatrix.length; row++){
         for(var col = 0; col < costMatrix[row].length; col++){
-
             var curr_index = GetGridIndexFromCostMatrix(row, col, costMatrix);
+            g.setNode(curr_index, curr_index);
+
             if(isValidIndex(row + 1, col, costMatrix)){
                 var adjacent_index = GetGridIndexFromCostMatrix(row + 1, col, costMatrix);
+                g.setNode(adjacent_index, adjacent_index);
                 g.setEdge(curr_index, adjacent_index, { weight: costMatrix[row + 1][col][0]});
             }
 
             if(isValidIndex(row - 1, col, costMatrix)){
                 var adjacent_index = GetGridIndexFromCostMatrix(row - 1, col, costMatrix);
+                g.setNode(adjacent_index, adjacent_index);
                 g.setEdge(curr_index, adjacent_index, { weight: costMatrix[row - 1][col][0]});
             }
 
             if(isValidIndex(row, col + 1, costMatrix)){
                 var adjacent_index = GetGridIndexFromCostMatrix(row, col + 1, costMatrix);
+                g.setNode(adjacent_index, adjacent_index);
                 g.setEdge(curr_index, adjacent_index, { weight: costMatrix[row][col + 1][0]});
             }
 
             if(isValidIndex(row, col - 1, costMatrix)){
                 var adjacent_index = GetGridIndexFromCostMatrix(row, col - 1, costMatrix);
+                g.setNode(adjacent_index, adjacent_index);
                 g.setEdge(curr_index, adjacent_index, { weight: costMatrix[row][col - 1][0]});
             }            
         }
     }
-
-    var shortDistances = graphlib.alg.dijkstra(g, "A", function(e){ return e.weight });  
+    var shortDistances = alg.dijkstra(g, costMatrixData.startCellIndex, function(e){ return Math.abs((-1 * g.edge(e).weight) + 2) });  
 
     var max = 1000000;
     var i = 0;
     var pathCellsArray = [];
     var curr_node = shortDistances[costMatrixData.endCellIndex];
+    var curr_node_val = costMatrixData.endCellIndex;
+
     while(i < max){
         i++;
-        if(curr_node === costMatrixData.startCellIndex){
+        if(curr_node_val == costMatrixData.startCellIndex){
             break;
         }
 
         pathCellsArray.unshift(curr_node);
 
+        curr_node_val = curr_node.predecessor;
         curr_node = shortDistances[curr_node.predecessor];
     }
 
     console.log("Done doing the shortest path calculations!");
     console.log(pathCellsArray);
 
-    return pathCellsArray;
+//    var numWayPointsToRetrieve = Math.min(8, pathCellsArray.length);
 
+    var wayPointStep = Math.ceil(pathCellsArray.length / 8);
+
+    console.log("About to clean up waypoint cells");
+    waypointsToReturn = [];
+    for(var i = 0; i < pathCellsArray.length; i += wayPointStep){
+        var nodeIndex = pathCellsArray[i].predecessor;
+        var waypointCellCenter = turf.centroid(squareGrid.features[nodeIndex]);
+        waypointsToReturn.push(waypointCellCenter);
+    }
+
+    console.log("Waypoints returned: ");
+    console.log(waypointsToReturn);
+    return waypointsToReturn;
 }
 
 function CalculateWaypoints(postBody, res){
@@ -203,7 +235,6 @@ function CalculateWaypoints(postBody, res){
     //console.log(cellSize)
     var squareGrid = turf.squareGrid(bbox, cellSize, units);
 
-    console.log(squareGrid);
     console.log("Have square grid, working on collect");
     
     // Collect the 'score' property from each squareGrid cell, and attach it as the 'values' array to each squareGrid cell 
@@ -225,8 +256,8 @@ function CalculateWaypoints(postBody, res){
       return 0;
     }
 
-    var startPoint = [postBody.startLatitude, postBody.startLongitude];
-    var endPoint = [postBody.endLatitude, postBody.endLongitude];
+    var startPoint = [postBody.startLongitude, postBody.startLatitude];
+    var endPoint = [postBody.endLongitude, postBody.endLatitude];
     
     console.log("About to start GreedySelectWaypoints");
     var waypoints = GreedySelectWaypoints(collected, startPoint, endPoint);
