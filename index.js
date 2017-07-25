@@ -138,7 +138,7 @@ function isValidIndex(row, col, costMatrix){
     return false;
 }
 
-function GreedySelectWaypoints(squareGrid, startPoint, endPoint){
+function GreedySelectWaypoints(squareGrid, startPoint, endPoint, minValue){
     // Use Dijkstra's to do shortest path 
 
     // 1. Build cost matrix from squareGrid
@@ -181,7 +181,7 @@ function GreedySelectWaypoints(squareGrid, startPoint, endPoint){
             }            
         }
     }
-    var shortDistances = alg.dijkstra(g, costMatrixData.startCellIndex, function(e){ return Math.abs((-1 * g.edge(e).weight) + 2) });  
+    var shortDistances = alg.dijkstra(g, costMatrixData.startCellIndex, function(e){ return g.edge(e).weight - minValue });  
 
     var max = 1000000;
     var i = 0;
@@ -204,7 +204,6 @@ function GreedySelectWaypoints(squareGrid, startPoint, endPoint){
     console.log("Done doing the shortest path calculations!");
     console.log(pathCellsArray);
 
-//    var numWayPointsToRetrieve = Math.min(8, pathCellsArray.length);
 
     var wayPointStep = Math.ceil(pathCellsArray.length / 8);
 
@@ -243,8 +242,12 @@ function CalculateWaypoints(postBody, res){
     var collected = turf.collect(squareGrid, dataPoints, 'score', 'values');
 
     // Iterate throug each cell and add all the collected 'values' property together 
+    var minValue = 0;
     for(i = 0; i < collected.features.length; i++){
         collected.features[i].properties.totalScore =  collected.features[i].properties.values.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        if(collected.features[i].properties.totalScore < minValue){
+            minValue = collected.features[i].properties.totalScore;
+        }
     }
 
     // Define a compare function to compare polygons by score, from largest to smallest 
@@ -260,7 +263,7 @@ function CalculateWaypoints(postBody, res){
     var endPoint = [postBody.endLongitude, postBody.endLatitude];
     
     console.log("About to start GreedySelectWaypoints");
-    var waypoints = GreedySelectWaypoints(collected, startPoint, endPoint);
+    var waypoints = GreedySelectWaypoints(collected, startPoint, endPoint, minValue);
     console.log("GreedySelectWaypoints is done");
 
     // Pick waypoints from path cells 
