@@ -24,7 +24,7 @@ def getDistanceBetweenTwoPoints(point1, point2):
 
 def getNodeJSWayPoints(allData, startEndCoords):
     # Make request to node.js endpoint 
-    fullUrl = "http://127.0.0.1:5000/" 
+    fullUrl = "https://waypointcalc.herokuapp.com/" 
     safe = '$\':'
     urlEncodedData = urllib.parse.quote(str(allData), safe = safe).encode('utf8')
     
