@@ -117,6 +117,290 @@ input:checked + .slider:before {
     transform: translate(-50%, -50%);
 }
 
+#DIV_1 {
+    box-sizing: border-box;
+    color: rgb(64, 64, 64);
+    display: flex;
+    height: 66px;
+    text-decoration: none solid rgb(64, 64, 64);
+    text-size-adjust: 100%;
+    width: 348px;
+    column-rule-color: rgb(64, 64, 64);
+    perspective-origin: 174px 33px;
+    transform-origin: 174px 33px;
+    caret-color: rgb(64, 64, 64);
+    border: 0px none rgb(64, 64, 64);
+    font: normal normal normal normal 14px / 20px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    outline: rgb(64, 64, 64) none 0px;
+}/*#DIV_1*/
+
+#DIV_2 {
+    box-sizing: border-box;
+    color: rgb(64, 64, 64);
+    height: 66px;
+    min-height: auto;
+    min-width: auto;
+    text-decoration: none solid rgb(64, 64, 64);
+    text-size-adjust: 100%;
+    width: 292px;
+    column-rule-color: rgb(64, 64, 64);
+    perspective-origin: 146px 33px;
+    transform-origin: 146px 33px;
+    caret-color: rgb(64, 64, 64);
+    border: 0px none rgb(64, 64, 64);
+    font: normal normal normal normal 14px / 20px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    outline: rgb(64, 64, 64) none 0px;
+}/*#DIV_2*/
+
+#DIV_3, #DIV_13 {
+    box-sizing: border-box;
+    color: rgb(64, 64, 64);
+    display: flex;
+    height: 33px;
+    text-decoration: none solid rgb(64, 64, 64);
+    text-size-adjust: 100%;
+    touch-action: none;
+    width: 292px;
+    column-rule-color: rgb(64, 64, 64);
+    perspective-origin: 146px 16.5px;
+    transform-origin: 146px 16.5px;
+    caret-color: rgb(64, 64, 64);
+    border: 0px none rgb(64, 64, 64);
+    font: normal normal normal normal 14px / 20px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    outline: rgb(64, 64, 64) none 0px;
+}/*#DIV_3, #DIV_13*/
+
+#SPAN_4, #SPAN_14 {
+    background-position: 4px 50%;
+    bottom: 0px;
+    box-sizing: border-box;
+    color: rgb(64, 64, 64);
+    /*cursor: move;*/
+    display: block;
+    height: 20px;
+    left: 0px;
+    min-height: auto;
+    min-width: auto;
+    position: relative;
+    right: 0px;
+    text-decoration: none solid rgb(64, 64, 64);
+    text-size-adjust: 100%;
+    top: 0px;
+    touch-action: none;
+    width: 34px;
+    z-index: 1;
+    column-rule-color: rgb(64, 64, 64);
+    perspective-origin: 17px 10px;
+    transform-origin: 17px 10px;
+    caret-color: rgb(64, 64, 64);
+    background: rgba(0, 0, 0, 0) url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAOCAYAAAAIar0YAAAAPElEQVQI12NgyP2vAMTvoViBAUgkAPF/KHZgAIPc/wVgTALI/W8AxlCOA5KhBlgEMLQQawuSwzCcjuY5ANuAPlWIywE9AAAAAElFTkSuQmCC") no-repeat scroll 4px 50% / auto padding-box border-box;
+    border: 0px none rgb(64, 64, 64);
+    font: normal normal normal normal 14px / 20px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    margin: 6px 0px 0px;
+    outline: rgb(64, 64, 64) none 0px;
+}/*#SPAN_4, #SPAN_14*/
+
+#DIV_5, #DIV_15 {
+    box-sizing: border-box;
+    color: rgb(64, 64, 64);
+    height: 33px;
+    min-height: auto;
+    min-width: auto;
+    text-decoration: none solid rgb(64, 64, 64);
+    text-size-adjust: 100%;
+    width: 258px;
+    column-rule-color: rgb(64, 64, 64);
+    perspective-origin: 129px 16.5px;
+    transform-origin: 129px 16.5px;
+    caret-color: rgb(64, 64, 64);
+    border: 0px none rgb(64, 64, 64);
+    font: normal normal normal normal 14px / 20px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    outline: rgb(64, 64, 64) none 0px;
+}/*#DIV_5, #DIV_15*/
+
+#DIV_6, #DIV_16 {
+    bottom: 0px;
+    box-sizing: border-box;
+    color: rgb(64, 64, 64);
+    height: 28px;
+    left: -33px;
+    position: relative;
+    right: 33px;
+    text-decoration: none solid rgb(64, 64, 64);
+    text-size-adjust: 100%;
+    top: 0px;
+    white-space: nowrap;
+    width: 258px;
+    column-rule-color: rgb(64, 64, 64);
+    perspective-origin: 129px 14px;
+    transform-origin: 129px 14px;
+    caret-color: rgb(64, 64, 64);
+    border: 0px none rgb(64, 64, 64);
+    font: normal normal normal normal 14px / 20px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    margin: 0px 0px 5px;
+    outline: rgb(64, 64, 64) none 0px;
+}/*#DIV_6, #DIV_16*/
+
+#DIV_7 {
+    bottom: -7px;
+    box-sizing: border-box;
+    color: rgb(255, 255, 255);
+    height: 18px;
+    left: 16px;
+    position: relative;
+    right: -16px;
+    text-align: center;
+    text-decoration: none solid rgb(255, 255, 255);
+    text-size-adjust: 100%;
+    top: 7px;
+    white-space: nowrap;
+    width: 18px;
+    column-rule-color: rgb(255, 255, 255);
+    perspective-origin: 9px 9px;
+    transform-origin: 9px 9px;
+    caret-color: rgb(255, 255, 255);
+    background: rgb(20, 157, 73) none repeat scroll 0% 0% / auto padding-box border-box;
+    border: 0px none rgb(255, 255, 255);
+    border-radius: 50% 50% 50% 50%;
+    font: normal normal bold normal 13px / 17px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    outline: rgb(255, 255, 255) none 0px;
+}/*#DIV_7*/
+
+#sourceAddress, #destAddress {
+    bottom: 18px;
+    color: rgb(64, 64, 64);
+    height: 28px;
+    left: 42px;
+    position: relative;
+    right: -42px;
+    text-decoration: none solid rgb(64, 64, 64);
+    text-size-adjust: 100%;
+    top: -18px;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 258px;
+    column-rule-color: rgb(64, 64, 64);
+    perspective-origin: 129px 14px;
+    transform-origin: 129px 14px;
+    caret-color: rgb(64, 64, 64);
+    background: rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box;
+    border: 1px solid rgb(190, 190, 190);
+    font: normal normal normal normal 16px / 22.8571px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    outline: rgb(64, 64, 64) none 0px;
+    padding: 0px 5px 1px 7px;
+}/*#INPUT_8, #INPUT_18*/
+
+#A_9, #A_19 {
+    background-position: 50% 50%;
+    box-sizing: border-box;
+    color: rgb(64, 64, 64);
+    display: none;
+    height: 25px;
+    position: relative;
+    right: -45px;
+    text-decoration: none solid rgb(64, 64, 64);
+    text-size-adjust: 100%;
+    top: -18px;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 25px;
+    column-rule-color: rgb(64, 64, 64);
+    perspective-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    caret-color: rgb(64, 64, 64);
+    background: rgba(0, 0, 0, 0) url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAOklEQVQY02PYvXv3eyBOYMACQOIgeRjjP7pCDHF0AVwakSXmY1WApBCmYD4DHkfiNomgm4jyHTHhBACCPX7JRS/8qAAAAABJRU5ErkJggg==") no-repeat scroll 50% 50% / auto padding-box border-box;
+    border: 0px none rgb(64, 64, 64);
+    font: normal normal normal normal 14px / 20px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    outline: rgb(64, 64, 64) none 0px;
+}/*#A_9, #A_19*/
+
+#DIV_10, #DIV_20 {
+    box-sizing: border-box;
+    color: rgb(192, 70, 70);
+    display: none;
+    height: auto;
+    position: relative;
+    text-decoration: none solid rgb(192, 70, 70);
+    text-size-adjust: 100%;
+    width: 300px;
+    column-rule-color: rgb(192, 70, 70);
+    perspective-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    caret-color: rgb(192, 70, 70);
+    background: rgb(244, 244, 244) none repeat scroll 0% 0% / auto padding-box border-box;
+    border: 0px none rgb(192, 70, 70);
+    font: normal normal normal normal 14px / 20px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    margin: 11px 0px 8px -12px;
+    outline: rgb(192, 70, 70) none 0px;
+    padding: 8px 28px 12px 32px;
+}/*#DIV_10, #DIV_20*/
+
+#A_11, #A_21 {
+    background-position: 50% 50%;
+    box-sizing: border-box;
+    color: rgb(64, 64, 64);
+    display: block;
+    height: 25px;
+    position: absolute;
+    right: 6px;
+    text-decoration: underline solid rgb(64, 64, 64);
+    text-size-adjust: 100%;
+    top: 4px;
+    width: 25px;
+    column-rule-color: rgb(64, 64, 64);
+    perspective-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    caret-color: rgb(64, 64, 64);
+    background: rgba(0, 0, 0, 0) url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAOklEQVQY02PYvXv3eyBOYMACQOIgeRjjP7pCDHF0AVwakSXmY1WApBCmYD4DHkfiNomgm4jyHTHhBACCPX7JRS/8qAAAAABJRU5ErkJggg==") no-repeat scroll 50% 50% / auto padding-box border-box;
+    border: 0px none rgb(64, 64, 64);
+    font: normal normal normal normal 14px / 20px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    outline: rgb(64, 64, 64) none 0px;
+}/*#A_11, #A_21*/
+
+#A_12, #A_22 {
+    box-sizing: border-box;
+    color: rgb(51, 122, 183);
+    text-decoration: underline solid rgb(51, 122, 183);
+    text-size-adjust: 100%;
+    column-rule-color: rgb(51, 122, 183);
+    perspective-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    caret-color: rgb(51, 122, 183);
+    border: 0px none rgb(51, 122, 183);
+    font: normal normal normal normal 14px / 20px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    outline: rgb(51, 122, 183) none 0px;
+}/*#A_12, #A_22*/
+
+#DIV_17 {
+    bottom: -7px;
+    box-sizing: border-box;
+    color: rgb(255, 255, 255);
+    height: 18px;
+    left: 16px;
+    position: relative;
+    right: -16px;
+    text-align: center;
+    text-decoration: none solid rgb(255, 255, 255);
+    text-size-adjust: 100%;
+    top: 7px;
+    white-space: nowrap;
+    width: 18px;
+    column-rule-color: rgb(255, 255, 255);
+    perspective-origin: 9px 9px;
+    transform-origin: 9px 9px;
+    caret-color: rgb(255, 255, 255);
+    background: rgb(238, 64, 54) none repeat scroll 0% 0% / auto padding-box border-box;
+    border: 0px none rgb(255, 255, 255);
+    border-radius: 50% 50% 50% 50%;
+    font: normal normal bold normal 13px / 17px "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    outline: rgb(255, 255, 255) none 0px;
+}/*#DIV_17*/
+
+#GoButton {
+    margin-left: 19em; 
+}
+
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }

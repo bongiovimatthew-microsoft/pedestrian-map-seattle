@@ -63,15 +63,41 @@
             </div>
             <br>
             <h5>Step 2: Decide where you want to go</h5>
-            <div id="locationField">
-              <input id="sourceAddress" placeholder="From"
-                     type="text"></input>
-                     <!-- onFocus="GeolocateSource()"  -->
-              <input id="destAddress" placeholder="To"
-                     type="text"></input>
-                     <!-- onFocus="GeoLocateDest()" -->
+
+            <div id="DIV_1">
+                <div id="DIV_2">
+                    <div id="DIV_3">
+                        <span id="SPAN_4"></span>
+                        <div id="DIV_5">
+                            <div id="DIV_6">
+                                <div id="DIV_7">
+                                    A
+                                </div>
+                                <input type="text" id="sourceAddress" maxlength="1000" placeholder="From" /><a href="#" title="Remove" id="A_9"></a>
+                            </div>
+                            <div id="DIV_10">
+                                <a href="#" title="Close" id="A_11"></a>An exact match was not found. Use<a href="#" id="A_12"></a> or change the search term.
+                            </div>
+                        </div>
+                    </div>
+                    <div id="DIV_13">
+                        <span id="SPAN_14"></span>
+                        <div id="DIV_15">
+                            <div id="DIV_16">
+                                <div id="DIV_17">
+                                    B
+                                </div>
+                                <input type="text" id="destAddress" maxlength="1000" placeholder="To" /><a href="#" title="Remove" id="A_19"></a>
+                            </div>
+                            <div id="DIV_20">
+                                <a href="#" title="Close" id="A_21"></a>An exact match was not found. Use<a href="#" id="A_22"></a> or change the search term.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button onclick="GetRoute()">Go</button>
+
+            <button id = "GoButton" onclick="GetRoute()">Go</button>
             <div id="directionsPanel"></div>
             <div id="directionsItinerary"></div>
                 <br>
@@ -91,11 +117,10 @@
                 </div>
         </div>
     </div>
-
     <div id='myMap'></div>
     <div class="loader" id="loadingWheel" style="visibility: hidden;"></div>
-    <!-- <script src="http://seattlecitypulse.com/scripts/baseMapUi.js"></script> -->
-    <script src="baseMapUi.js"></script>
+    <script src="http://seattlecitypulse.com/scripts/baseMapUi.js"></script>
+    <!-- <script src="baseMapUi.js"></script> -->
     <!-- <script src="https://assets.onestore.ms/cdnfiles/external/webcore/4.19.0/scripts/bootstrap.js "></script> -->
     <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
