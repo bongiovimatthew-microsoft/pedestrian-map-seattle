@@ -47,18 +47,21 @@ function checkIfFormattedItineraryTextSaysTurnBack(formattedItineraryPathText) {
 function ClearAndResetRouteData(){
 	// Clear any previously calculated directions.
     directionsManager.clearAll();
-
+    
     // Reset the options that we want on directionsManager
     directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
     directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
+
+    // Remove the layer of pushpins
+    map.layers.clear();
 }
 
 function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocation){
     console.log("Enter: CalculateDirectionsForNewRoute");
 	
-	console.log("startWaypointLocation: " + startWaypointLocation);
-	console.log("endWaypointLocation: " + endWaypointLocation);
-	
+    console.log("startWaypointLocation: " + startWaypointLocation);
+    console.log("endWaypointLocation: " + endWaypointLocation);
+    
 	// Clear everything and try to start anew 
 	ClearAndResetRouteData();
 
