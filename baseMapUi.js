@@ -56,18 +56,21 @@ function ClearAndResetRouteData(){
     map.layers.clear();
 }
 
-function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocation){
+function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocation, startWaypointAddress, endWaypointAddress){
     console.log("Enter: CalculateDirectionsForNewRoute");
 	
     console.log("startWaypointLocation: " + startWaypointLocation);
     console.log("endWaypointLocation: " + endWaypointLocation);
-    
+
+    console.log("startWaypointAddress: " + startWaypointAddress);
+    console.log("endWaypointAddress: " + endWaypointAddress);
+	
 	// Clear everything and try to start anew 
 	ClearAndResetRouteData();
 
     // Create waypoints, and add them to directionsManager
-    var startWaypoint = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(startWaypointLocation[0], startWaypointLocation[1]) });
-    var endWaypoint = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(endWaypointLocation[0], endWaypointLocation[1])});
+    var startWaypoint = new Microsoft.Maps.Directions.Waypoint({ address: startWaypointAddress }); // location: new Microsoft.Maps.Location(startWaypointLocation[0], startWaypointLocation[1]) });
+    var endWaypoint = new Microsoft.Maps.Directions.Waypoint({ address: endWaypointAddress }); //location: new Microsoft.Maps.Location(endWaypointLocation[0], endWaypointLocation[1])});
     directionsManager.addWaypoint(startWaypoint);
     
     // Get the chosen knobs 
@@ -388,5 +391,15 @@ function GetRoute() {
     startWaypointLocation = [sourcePlace.geometry.location.lat(), sourcePlace.geometry.location.lng()] 
     endWaypointLocation = [destPlace.geometry.location.lat(), destPlace.geometry.location.lng()] 
 
-    CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocation);
+    sourcePlaceAddr = sourcePlace.formatted_address
+    if(sourcePlace.formatted_address.toLowerCase().indexOf(sourcePlace.name.toLowerCase()) == -1) {
+        sourcePlaceAddr = sourcePlace.name + ", " + sourcePlaceAddr
+    }    
+
+    destPlaceAddr = destPlace.formatted_address
+    if(destPlace.formatted_address.toLowerCase().indexOf(destPlace.name.toLowerCase()) == -1) {
+        destPlaceAddr = destPlace.name + ", " + destPlaceAddr;
+    }    
+
+    CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocation, sourcePlaceAddr, destPlaceAddr);
 }
