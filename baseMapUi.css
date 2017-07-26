@@ -12,6 +12,8 @@ html, body{
 img{
   margin-top: -3em;
   margin-bottom: -0.7em;
+  margin-left: 0em;
+  width: 100%;
 }
 
 .directionsContainer{
