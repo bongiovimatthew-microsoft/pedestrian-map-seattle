@@ -121,3 +121,7 @@ input:checked + .slider:before {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+h5{
+  margin-left: 0.5em;
+}

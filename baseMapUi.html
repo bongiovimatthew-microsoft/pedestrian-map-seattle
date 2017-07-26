@@ -4,7 +4,8 @@
 <head>
     <title>CityPulse</title>
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
-    <link rel="stylesheet" href="baseMapUi.css">
+    <!-- <link rel="stylesheet" href="baseMapUi.css"> -->
+    <link rel="stylesheet" href="http://seattlecitypulse.com/style/baseMapUi.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">    
 </head>
 
@@ -12,11 +13,10 @@
     <div class="directionsContainer">
         <div class="page-header">
             <img src="http://seattlecitypulse.com/images/CityPulseHeader.png">
-        </div>
-        <div id="directionsPanel"></div>
-        <div id="directionsItinerary"></div>
+        </div>        
         <div>
             <div class="toggle-switch-container">
+            <h5>Step 1: Choose your route features</h5>
                 <div class="row padding-left">
                     <div class="col-md-3" >
                         <label>Pedestrian Safety</label>
@@ -60,6 +60,11 @@
                         </label>
                     </div>
                 </div>
+            </div>
+            <br>
+            <h5>Step 2: Decide where you want to go</h5>
+            <div id="directionsPanel"></div>
+            <div id="directionsItinerary"></div>
                 <br>
                 <br>
                 <br>
@@ -75,14 +80,13 @@
                     </div>                    
                     </div>
                 </div>
-                
-            </div>
         </div>
     </div>
 
     <div id='myMap'></div>
     <div class="loader" id="loadingWheel" style="visibility: hidden;"></div>
-    <script src="baseMapUi.js"></script>
+    <script src="http://seattlecitypulse.com/scripts/baseMapUi.js"></script>
+    <!-- <script src="baseMapUi.js"></script> -->
     <!-- <script src="https://assets.onestore.ms/cdnfiles/external/webcore/4.19.0/scripts/bootstrap.js "></script> -->
     <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
