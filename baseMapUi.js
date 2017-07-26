@@ -59,6 +59,14 @@ function ClearAndResetRouteData(){
     //directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
     //directionsManager.showInputPanel('directionsPanel');
 
+    map.dispose(); 
+
+    map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
+        credentials: bingMapsAPIKey,
+        center: new Microsoft.Maps.Location(47.606209, -122.332071),
+        zoom: 12
+    });
+
 	directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
         
     // Set Route Mode to walking
@@ -80,6 +88,7 @@ function CalculateDirectionsForNewRoute(route, startWaypointLocation, endWaypoin
 	console.log("startWaypointLocation: " + startWaypointLocation);
 	console.log("endWaypointLocation: " + endWaypointLocation);
 	
+	// Clear everything and try to start anew 
 	ClearAndResetRouteData();
 
     // Create waypoints, and add them to directionsManager
@@ -276,10 +285,12 @@ function RemoveSwitchbacksFromRoute(route){
 function directionsUpdatedFunc(directionsEvent) {
     console.log("Enter: directionsUpdated callback");
 
+	// document.getElementById("loadingWheel").style.visibility='visible'; 
+
     var startWaypointLocation = [directionsEvent.route[0].routeLegs[0].startWaypointLocation.latitude, directionsEvent.route[0].routeLegs[0].startWaypointLocation.longitude]
     var endWaypointLocation = [directionsEvent.route[0].routeLegs[0].endWaypointLocation.latitude, directionsEvent.route[0].routeLegs[0].endWaypointLocation.longitude]
     var currentRouteCoords = [startWaypointLocation, endWaypointLocation];       
-    var route = directionsManager.getRouteResult();
+    var route = directionsEvent.route[0];
 
     var newRoute = false;
     if (oldRouteCoords.length != currentRouteCoords.length) {
@@ -301,6 +312,9 @@ function directionsUpdatedFunc(directionsEvent) {
     else {
    		CalculateDirectionsForNewRoute(route, startWaypointLocation, endWaypointLocation);
     }      
+
+    document.getElementById("loadingWheel").style.visibility='hidden'; 
+
     console.log("Exit: directionsUpdated callback");          
 }
 
