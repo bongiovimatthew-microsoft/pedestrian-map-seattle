@@ -289,7 +289,7 @@ function loadMapScenario() {
     });
 }
 
-function initAutocompleteSource() {
+function InitAutocompleteSource() {
     // Create the autocomplete object, restricting the search to geographical
     // location types.
     sourceAutocomplete = new google.maps.places.Autocomplete(
@@ -303,7 +303,7 @@ function initAutocompleteSource() {
 }
 
 
-function initAutocompleteDest() {
+function InitAutocompleteDest() {
     // Create the autocomplete object, restricting the search to geographical
     // location types.
     destAutocomplete = new google.maps.places.Autocomplete(
@@ -316,9 +316,9 @@ function initAutocompleteDest() {
     destAutocomplete.addListener('place_changed', UpdateDestAddress);
 }
 
-function initAutocomplete() {
-    initAutocompleteSource();
-    initAutocompleteDest();
+function InitAutocomplete() {
+    InitAutocompleteSource();
+    InitAutocompleteDest();
 }
 
 function UpdateSourceAddress() {
