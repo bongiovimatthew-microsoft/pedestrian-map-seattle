@@ -2,6 +2,7 @@ from .Seattle911Cleaner import Seattle911Cleaner
 from .SeattleAccessibilityCleaner import SeattleAccessibilityCleaner
 from .SeattleNatureCleaner import SeattleNatureCleaner
 from .SeattlePublicToiletsCleaner import SeattlePublicToiletsCleaner
+from datetime import datetime
 
 class DataAggregator():
 
@@ -33,6 +34,12 @@ class DataAggregator():
 
         # TODO: Call each cleaner in a separate thread 
         for cleaner in self.allCleaners:
+            print("{0}: Getting cleaner name:{1} weight:{2}".format(datetime.now(), cleaner[0], knobWeights[cleaner[1]]))
+
+            if (0 == knobWeights[cleaner[1]]):
+                print("Skipping cleaner {0}".format(cleaner[0]))
+                continue
+
             cleanerName = eval(cleaner[0])()
             cleanerData = cleanerName.GetData(dateRange, boundingBox)
             cleanerPoints = cleanerData["features"]

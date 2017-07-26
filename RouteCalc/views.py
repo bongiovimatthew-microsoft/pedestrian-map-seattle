@@ -23,6 +23,7 @@ def getDistanceBetweenTwoPoints(point1, point2):
     return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
 
 def getNodeJSWayPoints(allData, startEndCoords):
+    print("Querying nodeJS for waypoints")
     # Make request to node.js endpoint 
     fullUrl = "https://waypointcalc.herokuapp.com/" 
     safe = '$\':'
@@ -47,10 +48,10 @@ def getNodeJSWayPoints(allData, startEndCoords):
     return wayPointCalcResponseStr
 
 def snapToRoadWayPoints(startPointCoord, wayPointsCoordsArray, endPointCoord):
+    print("Snapping points to road")
     allPointsToSnapArray = [startPointCoord] + wayPointsCoordsArray + [endPointCoord]
     allPointsToSnapStrArray = ["{0},{1}".format(pointToSnap[0], pointToSnap[1]) for pointToSnap in allPointsToSnapArray]
 
-    print(allPointsToSnapStrArray)
     snapToRoadsGetUrl = "https://roads.googleapis.com/v1/snapToRoads?path={0}&interpolate=false&key={1}".format("|".join(allPointsToSnapStrArray), GOOGLE_API_KEY)
     
     req = urllib.request.Request(snapToRoadsGetUrl)
@@ -102,7 +103,6 @@ def getRouteUsingBingAPI(snappedPointsCoordsArray, startPointCoord, endPointCoor
     # Add end coord and key
     bingReq += "&wp.{0}={1},{2}".format(wayPointIndex, endPointCoord[0], endPointCoord[1])
     bingReq += "&key=AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf"
-    print(bingReq)
 
     req = urllib.request.Request(bingReq)
     response = urllib.request.urlopen(req, timeout = 10)
@@ -164,35 +164,35 @@ def RouteCalcCore(request):
 
     allData = aggregator.GetAllCleanData(dateRange, boundingBox, knobWeights)    
 
-    print(boundingBox)
-    print(allData)
+    wayPointsGeoJSONDictArray = []
 
-    wayPointCalcResponseStr = getNodeJSWayPoints(allData, [startPointCoord, endPointCoord])
-    print(wayPointCalcResponseStr)
+    if (len(allData["features"]) > 0):
+        wayPointCalcResponseStr = getNodeJSWayPoints(allData, [startPointCoord, endPointCoord])
+        print(wayPointCalcResponseStr)
 
-    wayPointsReceived = json.loads(wayPointCalcResponseStr)
-    wayPointsCoordsArray = [[gjWayPoint["geometry"]["coordinates"][1], gjWayPoint["geometry"]["coordinates"][0]] for gjWayPoint in wayPointsReceived] 
+        wayPointsReceived = json.loads(wayPointCalcResponseStr)
+        wayPointsCoordsArray = [[gjWayPoint["geometry"]["coordinates"][1], gjWayPoint["geometry"]["coordinates"][0]] for gjWayPoint in wayPointsReceived] 
 
-    # Sort the array so our route goes from start to end rather than jumbled up
-    wayPointsCoordsArray.sort(key=lambda x: wayPointsSortKeyFunc(startPointCoord, x))
+        # Sort the array so our route goes from start to end rather than jumbled up
+        wayPointsCoordsArray.sort(key=lambda x: wayPointsSortKeyFunc(startPointCoord, x))
 
-    snappedPointsResponseStr = snapToRoadWayPoints(startPointCoord, wayPointsCoordsArray, endPointCoord)
-    print(snappedPointsResponseStr)
+        snappedPointsResponseStr = snapToRoadWayPoints(startPointCoord, wayPointsCoordsArray, endPointCoord)
+        print(snappedPointsResponseStr)
 
-    snappedPointsReceived = json.loads(snappedPointsResponseStr)
-    # print(snappedPointsReceived)
-    # print(snappedPointsReceived[0])
-    snappedPointsCoordsArray = [[snappedWayPoint["location"]["latitude"], snappedWayPoint["location"]["longitude"]] for snappedWayPoint in (snappedPointsReceived["snappedPoints"])[1:len(snappedPointsReceived["snappedPoints"]) - 1]] 
+        snappedPointsReceived = json.loads(snappedPointsResponseStr)
+        snappedPointsCoordsArray = [[snappedWayPoint["location"]["latitude"], snappedWayPoint["location"]["longitude"]] for snappedWayPoint in (snappedPointsReceived["snappedPoints"])[1:len(snappedPointsReceived["snappedPoints"]) - 1]] 
 
-    wayPointsGeoJSONDictArray = getGeoJSONFromWayPointsCoord(snappedPointsCoordsArray)
+        wayPointsGeoJSONDictArray = getGeoJSONFromWayPointsCoord(snappedPointsCoordsArray)
 
     # Get bing route
-    getRouteUsingBingAPI(snappedPointsCoordsArray, startPointCoord, endPointCoord)
+    # getRouteUsingBingAPI(snappedPointsCoordsArray, startPointCoord, endPointCoord)
 
     responseDict = {"waypoints": wayPointsGeoJSONDictArray}
     if ("includeData" in requestDict.keys()):
         responseDict["data"] = allData["features"]
 
-    print(wayPointsGeoJSONDictArray)
+    responseDict["numberPointsUsed"] = len(allData["features"])
+
+    print("Number points used: {0}".format(responseDict["numberPointsUsed"]))
 
     return JsonResponse(responseDict)
