@@ -2,6 +2,9 @@ var map;
 var directionsManager;
 var bingMapsAPIKey = 'AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf';
 var routeCalcUrl = "https://routecalculator.herokuapp.com/routeCalc/";
+var sourceAutocomplete;
+var destAutocomplete;
+
 // var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
 
 var oldRouteCoords = [];
@@ -44,47 +47,15 @@ function checkIfFormattedItineraryTextSaysTurnBack(formattedItineraryPathText) {
 function ClearAndResetRouteData(){
 	// Clear any previously calculated directions.
     directionsManager.clearAll();
-    directionsManager.dispose();
 
-    // directionsManager.clearDisplay();
-    // var allWaypointsCache = directionsManager.getAllWaypoints();
-    // for(var i = 0; i < directionsManager.getAllWaypoints().length; i++){
-    // 	console.log("Length: " + directionsManager.getAllWaypoints().length);
-    // 	console.log("Removing waypoint index: " + i);
-    // 	directionsManager.removeWaypoint(allWaypointsCache[i]);
-    // }
-    
     // Reset the options that we want on directionsManager
-    //directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
-    //directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
-    //directionsManager.showInputPanel('directionsPanel');
-
-    map.dispose(); 
-
-    map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
-        credentials: bingMapsAPIKey,
-        center: new Microsoft.Maps.Location(47.606209, -122.332071),
-        zoom: 12
-    });
-
-	directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
-        
-    // Set Route Mode to walking
     directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
     directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
-    directionsManager.showInputPanel('directionsPanel');
-    
-    Microsoft.Maps.Events.addHandler(
-      directionsManager,
-      'directionsUpdated',
-      directionsUpdatedFunc);
 }
 
-function CalculateDirectionsForNewRoute(route, startWaypointLocation, endWaypointLocation){
+function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocation){
     console.log("Enter: CalculateDirectionsForNewRoute");
 	
-	console.log("Route: ")
-	console.log(route);
 	console.log("startWaypointLocation: " + startWaypointLocation);
 	console.log("endWaypointLocation: " + endWaypointLocation);
 	
@@ -285,33 +256,12 @@ function RemoveSwitchbacksFromRoute(route){
 function directionsUpdatedFunc(directionsEvent) {
     console.log("Enter: directionsUpdated callback");
 
-	// document.getElementById("loadingWheel").style.visibility='visible'; 
-
     var startWaypointLocation = [directionsEvent.route[0].routeLegs[0].startWaypointLocation.latitude, directionsEvent.route[0].routeLegs[0].startWaypointLocation.longitude]
     var endWaypointLocation = [directionsEvent.route[0].routeLegs[0].endWaypointLocation.latitude, directionsEvent.route[0].routeLegs[0].endWaypointLocation.longitude]
     var currentRouteCoords = [startWaypointLocation, endWaypointLocation];       
-    var route = directionsEvent.route[0];
+    var route = directionsManager.getRouteResult();
 
-    var newRoute = false;
-    if (oldRouteCoords.length != currentRouteCoords.length) {
-        newRoute = true;
-    }
-    else {
-        if (checkIfTwoPointsAreTheSame(oldRouteCoords[0], currentRouteCoords[0]) &&
-            checkIfTwoPointsAreTheSame(oldRouteCoords[1], currentRouteCoords[1])) {
-            newRoute = false;
-        }
-        else {
-            newRoute = true;
-        }
-    }
-    
-    if (!newRoute) {
-        RemoveSwitchbacksFromRoute(route, directionsManager);
-    }
-    else {
-   		CalculateDirectionsForNewRoute(route, startWaypointLocation, endWaypointLocation);
-    }      
+    RemoveSwitchbacksFromRoute(route, directionsManager);
 
     document.getElementById("loadingWheel").style.visibility='hidden'; 
 
@@ -331,11 +281,109 @@ function loadMapScenario() {
         // Set Route Mode to walking
         directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.walking, routeOptimization: Microsoft.Maps.Directions.RouteOptimization.shortestDistance });
         directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directionsItinerary') });
-        directionsManager.showInputPanel('directionsPanel');
         
         Microsoft.Maps.Events.addHandler(
           directionsManager,
           'directionsUpdated',
           directionsUpdatedFunc);               
     });
+}
+
+function initAutocompleteSource() {
+    // Create the autocomplete object, restricting the search to geographical
+    // location types.
+    sourceAutocomplete = new google.maps.places.Autocomplete(
+        /** @type {!HTMLInputElement} */(document.getElementById('sourceAddress')),
+        // {types: ['geocode']}
+        );
+
+    // When the user selects an address from the dropdown, populate the address
+    // fields in the form.
+    sourceAutocomplete.addListener('place_changed', UpdateSourceAddress);
+}
+
+
+function initAutocompleteDest() {
+    // Create the autocomplete object, restricting the search to geographical
+    // location types.
+    destAutocomplete = new google.maps.places.Autocomplete(
+        /** @type {!HTMLInputElement} */(document.getElementById('destAddress')),
+        // {types: ['geocode']}
+        );
+
+    // When the user selects an address from the dropdown, populate the address
+    // fields in the form.
+    destAutocomplete.addListener('place_changed', UpdateDestAddress);
+}
+
+function initAutocomplete() {
+    initAutocompleteSource();
+    initAutocompleteDest();
+}
+
+function UpdateSourceAddress() {
+    console.log("Source address updated")
+    console.log(sourceAutocomplete.getPlace());
+}
+
+function UpdateDestAddress() {
+    console.log("Destination address updated")
+    console.log(destAutocomplete.getPlace());
+}
+
+// Bias the autocomplete object to the user's geographical location,
+// as supplied by the browser's 'navigator.geolocation' object.
+function Geolocate(autocompleteObj) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var geolocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        var circle = new google.maps.Circle({
+          center: geolocation,
+          radius: position.coords.accuracy
+        });
+        autocompleteObj.setBounds(circle.getBounds());
+      });
+    }
+}
+
+function GeoLocateSource() {
+    console.log("Entered GeoLocateSource")
+    Geolocate(sourceAutocomplete);
+}
+
+function GeoLocateDest() {
+    console.log("Entered GeoLocateDest")
+    Geolocate(destAutocomplete);
+}
+
+// issue-manigu-07252017 if they input an address, remove it and run click me without putting a proper addrwess, we use the old one
+function GetRoute() {
+    document.getElementById("loadingWheel").style.visibility='visible'; 
+
+    sourcePlace = sourceAutocomplete.getPlace()
+    destPlace = destAutocomplete.getPlace()
+
+    if (! sourcePlace) {
+        alert("Need a source address")
+        return;
+    }
+
+    if (! destPlace) {
+        alert("Need a dest address")
+        return;
+    }
+
+    console.log("Source address:")
+    console.log(sourcePlace);
+
+    console.log("Destination address:")
+    console.log(destPlace);
+
+    startWaypointLocation = [sourcePlace.geometry.location.lat(), sourcePlace.geometry.location.lng()] 
+    endWaypointLocation = [destPlace.geometry.location.lat(), destPlace.geometry.location.lng()] 
+
+    CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocation);
 }
