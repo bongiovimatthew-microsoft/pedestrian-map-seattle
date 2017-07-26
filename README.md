@@ -2,7 +2,7 @@
 
 Welcome to CityPulse, which provides customized walking routes for pedestrians.
 
-![Image of shoes walking](./docs/images/walking-shoes.jpg)
+![Image of shoes walking](./docs/images/CityPulseHeader.png)
 
 Welcome to our documentation. If you're looking for the code, go to our [GitHub repo](https://github.com/bongiovimatthew-microsoft/pedestrian-map-seattle).
 
