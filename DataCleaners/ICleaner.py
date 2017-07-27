@@ -1,6 +1,4 @@
-class ICleaner(): 
-    def __init__(self):
-        return
-        
-    def GetData(self, dateRange, boundingBox):
-        return
+class ICleaner():
+
+    def GetRequest(self, dateRange, boundingBox):
+        raise Exception("Error! You must implement GetRequest!")
