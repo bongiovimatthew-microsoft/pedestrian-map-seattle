@@ -235,7 +235,33 @@ function CalculateWaypoints(postBody, res){
     console.log("Starting CalculateWaypoints");
     
     var dataPoints = postBody.data;
-    var bbox = turf.bbox(dataPoints);
+
+    var startBboxPoint = [postBody.startLongitude, postBody.startLatitude];
+    var endBboxPoint = [postBody.endLongitude, postBody.endLatitude];
+
+    if (startBboxPoint[0] < endBboxPoint[0]) {
+        startBboxPoint[0] -= 0.005
+        endBboxPoint[0] += 0.005
+    }
+    else {
+        startBboxPoint[0] += 0.005
+        endBboxPoint[0] -= 0.005
+    }
+    if (startBboxPoint[1] < endBboxPoint[1]) {
+        startBboxPoint[1] -= 0.005
+        endBboxPoint[1] += 0.005
+    }
+    else {
+        startBboxPoint[1] += 0.005
+        endBboxPoint[1] -= 0.005
+    }
+
+    var startBboxPointFeature = turf.point(startBboxPoint);
+    var endBboxPointFeature = turf.point(endBboxPoint);
+
+    var bboxFeatures = [startBboxPointFeature, endBboxPointFeature];
+    var bboxFeatureCollection = turf.featureCollection(bboxFeatures);
+    var bbox = turf.bbox(bboxFeatureCollection);
 
     console.log("Have bounding box, working on square grid");
     
