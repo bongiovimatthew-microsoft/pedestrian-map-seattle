@@ -10,6 +10,9 @@ var destAutocomplete;
 var oldRouteCoords = [];
 var actualWayPoints = [];
 
+var centerLatToUse = 47.606209
+var centerLongToUse = -122.332071
+
 function getDistanceBetweenTwoPoints(coord1, coord2) {
     return Math.sqrt(Math.pow(coord1[1] - coord2[1], 2) + Math.pow(coord1[0] - coord2[0], 2))
 }
@@ -99,8 +102,12 @@ function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocati
                   "endLatitude": endWaypointLocation[0] ,
                   "endLongitude": endWaypointLocation[1],
                   "knobWeights": knobs,
-                  "includeData": 1
                   };
+
+
+    if(document.getElementById("show-data-switch").checked){
+        params["includeData"] = 1
+    }
     
     console.log("POST Parameters: ")
     console.log(params);
@@ -206,6 +213,11 @@ function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocati
                    document.getElementById('NoDataDiv').style.display = "block";
                 }
             }
+            else if ((JSON.parse(routeCalcReq.responseText)).numberPointsUsed > 2500) {
+                if(document.getElementById("show-data-switch").checked){
+                   document.getElementById('TooMuchDataDiv').style.display = "block";
+               }
+            }
 		}               
     }
     
@@ -293,7 +305,7 @@ function directionsUpdatedFunc(directionsEvent) {
 function loadMapScenario() {
     map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
         credentials: bingMapsAPIKey,
-        center: new Microsoft.Maps.Location(47.606209, -122.332071),
+        center: new Microsoft.Maps.Location(centerLatToUse, centerLongToUse),
         zoom: 12
     });
 
@@ -321,7 +333,17 @@ function InitAutocompleteSource() {
 
     // When the user selects an address from the dropdown, populate the address
     // fields in the form.
-    sourceAutocomplete.addListener('place_changed', UpdateSourceAddress);
+    sourceAutocomplete.addListener('place_changed', UpdateSourceAddress);        
+
+    var geolocation = {
+      lat: centerLatToUse,
+      lng: centerLongToUse
+    };
+    var circle = new google.maps.Circle({
+      center: geolocation,
+      radius: 10000
+    });
+    sourceAutocomplete.setBounds(circle.getBounds());
 }
 
 
@@ -336,6 +358,16 @@ function InitAutocompleteDest() {
     // When the user selects an address from the dropdown, populate the address
     // fields in the form.
     destAutocomplete.addListener('place_changed', UpdateDestAddress);
+
+    var geolocation = {
+      lat: centerLatToUse,
+      lng: centerLongToUse
+    };
+    var circle = new google.maps.Circle({
+      center: geolocation,
+      radius: 10000
+    });
+    destAutocomplete.setBounds(circle.getBounds());
 }
 
 function InitAutocomplete() {
@@ -385,6 +417,7 @@ function GeoLocateDest() {
 function GetRoute() {
     document.getElementById("loadingWheel").style.visibility='visible'; 
     document.getElementById('NoDataDiv').style.display = "none";
+    document.getElementById('TooMuchDataDiv').style.display = "none";
 
     sourcePlace = sourceAutocomplete.getPlace()
     destPlace = destAutocomplete.getPlace()
