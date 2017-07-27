@@ -12,9 +12,9 @@ All cleaners implement the ICleaner interface (currently located under ```/dataL
 
 You must implement the following methods:
 
-1. ```GetData(self, dateRange, boundingBox)```
+1. ```GetRequest(self, dateRange, boundingBox)```
 
-This method will return the cleaned data for the Seattle911 data store.
+This method will return the grequest request object necessary for gathering the data from the data source API.
 
 **Parameters:**
 * ```dateRange``` &ndash; the timeframe for which to get data
@@ -23,6 +23,12 @@ This method will return the cleaned data for the Seattle911 data store.
 * ```boundingBox[0][1]``` &ndash; longitude of upper left corner of bounding box
 * ```boundingBox[1][0]``` &ndash; latitude of lower right corner of bounding box
 * ```boundingBox[1][1]``` &ndash; longitude of lower right corner of bounding box
+
+**Returns:**
+Returns a grequest request object necessary for gathering the data from the data source API.
+
+
+2. ```CleanData()```
 
 **Returns:**
 Returns a GeoJSON blob containing all data, cleaned, and weighted appropriately.
@@ -60,14 +66,6 @@ GeoJSON should be of the form:
     }
 ```
 
-
-2. ```DataBoundary()```
-
-**Returns:**
-Returns a GeoJSON blob containing the bounding area in which the data for this cleaner is applicable.
-
-If possible, use ```HttpRequestManager.p``` to make requests to a data source API.
-
 ### Naming convention
 A new **ICleaner** implementation should follow the naming pattern:
 
@@ -78,9 +76,6 @@ After adding a new **ICleaner** implementation, you must update ```DataAggregato
 
 ### Test the cleaner
 In addition to creating a new implementation of **ICleaner**, you should create a test file to perform basic query testing of your new cleaner.
-
-### Handle API paging
-Many data sources perform request paging if the data being returned is too large. Your cleaner should handle this paging, and return a single GeoJSON blob from ```GetData()```.
 
 ### Handle API keys
 Many data sources you use will require an API key for access. You should add your API key to the ```ApiKeyManager.py``` class under **/dataLayer/**.
