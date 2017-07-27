@@ -27,7 +27,8 @@ class SeattleNatureCleaner(ICleaner):
     # Returns:
     #    GeoJSON blob containing all data, cleaned, and weighted appropriately
     def GetRequest(self, dateRange, boundingBox):
-        whereClause1 = "(city_feature='Heritage Trees' OR city_feature='Parks')"
+        # TODO-manigu-07272017 fix this filter
+        whereClause1 = "(city_feature!='Public Toilets')"
         whereClause2 = "within_box(location, {0}, {1}, {2}, {3})".format(str(boundingBox[0][0]), str(boundingBox[0][1]), str(boundingBox[1][0]), str(boundingBox[1][1]))
 
         url = "https://data.seattle.gov/resource/3c4b-gdxv.geojson"

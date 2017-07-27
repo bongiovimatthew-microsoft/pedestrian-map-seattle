@@ -26,6 +26,7 @@ def getNodeJSWayPoints(allData, startEndCoords):
     print("Querying nodeJS for waypoints")
     # Make request to node.js endpoint 
     fullUrl = "https://waypointcalc.herokuapp.com/" 
+    # fullUrl = "http://127.0.0.1:5000/" 
     safe = '$\':'
     urlEncodedData = urllib.parse.quote(str(allData), safe = safe).encode('utf8')
     
