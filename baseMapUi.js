@@ -78,7 +78,17 @@ function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocati
 	if (document.getElementById("safety-switch").checked) knobs.Safety = 1;
 	if (document.getElementById("accessibility-switch").checked) knobs.Accessibility = 1;
 	if (document.getElementById("nature-switch").checked) knobs.Nature = 1;
-	if (document.getElementById("toilet-switch").checked) knobs.Toilets = 1;	
+	if (document.getElementById("toilet-switch").checked) knobs.Toilets = 1;
+
+    var anyKnobsSelected = false
+    Object.keys(knobs).forEach(function(currentKey) {
+        if (knobs[currentKey] != 0) {
+            anyKnobsSelected = true
+        }
+    });
+
+    console.log("anyKnobsSelected:")
+    console.log(anyKnobsSelected)
 
 	console.log("Knobs: ")
 	console.log(knobs);
@@ -189,7 +199,13 @@ function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocati
 
 	        console.log("Waypoints data: ");
 	        console.log(actualWayPoints);
-	        console.log(directionsManager.getAllWaypoints());
+	        // console.log(directionsManager.getAllWaypoints());
+
+            if ((JSON.parse(routeCalcReq.responseText)).numberPointsUsed == 0) {
+                if (anyKnobsSelected) {
+                   document.getElementById('NoDataDiv').style.display = "block";
+                }
+            }
 		}               
     }
     
@@ -368,6 +384,7 @@ function GeoLocateDest() {
 // issue-manigu-07252017 if they input an address, remove it and run click me without putting a proper addrwess, we use the old one
 function GetRoute() {
     document.getElementById("loadingWheel").style.visibility='visible'; 
+    document.getElementById('NoDataDiv').style.display = "none";
 
     sourcePlace = sourceAutocomplete.getPlace()
     destPlace = destAutocomplete.getPlace()

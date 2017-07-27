@@ -396,6 +396,28 @@ input:checked + .slider:before {
     outline: rgb(255, 255, 255) none 0px;
 }/*#DIV_17*/
 
+#NoDataDiv {
+    /*border-collapse: collapse;*/
+    color: rgb(64, 64, 64);
+    /*height: 17px;*/
+    text-decoration: none solid rgb(64, 64, 64);
+    width: 330px;
+    column-rule-color: rgb(64, 64, 64);
+    perspective-origin: 180px 25px;
+    transform-origin: 180px 25px;
+    caret-color: rgb(64, 64, 64);
+    /*background: rgb(244, 244, 244) none repeat scroll 0% 0% / auto padding-box border-box;*/
+    /*border-top: 1px solid rgb(187, 187, 187);*/
+    border-right: 0px none rgb(64, 64, 64);
+    border-bottom: 0px none rgb(64, 64, 64);
+    border-left: 0px none rgb(64, 64, 64);
+    font: normal normal normal normal 13px / normal "Segoe UI", "San Francisco", Helvetica, Arial, sans-serif;
+    list-style: none outside none;
+    outline: rgb(64, 64, 64) none 0px;
+    padding: 15px 15px 17px;
+}/*#DIV_1*/
+
+
 #GoButton {
     margin-left: 19em; 
 }
