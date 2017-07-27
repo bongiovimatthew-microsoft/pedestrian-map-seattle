@@ -33,7 +33,7 @@ class SeattleAccessibilityCleaner(ICleaner):
         whereClause2 = "within_box(shape, {0}, {1}, {2}, {3})".format(str(boundingBox[0][0]), str(boundingBox[0][1]), str(boundingBox[1][0]), str(boundingBox[1][1]))
 
         url = "https://data.seattle.gov/resource/j3nx-ir4y.json"
-        url += '?$where=' + whereClause1 + ' AND ' + whereClause2 + '&$limit=2000'
+        url += '?$where=' + whereClause1 + ' AND ' + whereClause2 + '&$limit=50000'
 
         headers = {'Content-Type': 'application/json'}
 

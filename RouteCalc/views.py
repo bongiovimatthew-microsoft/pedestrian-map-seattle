@@ -5,6 +5,7 @@ from pprint import pprint as pp
 import json
 import urllib.request
 import urllib.parse
+import random
 
 # issue-manish-06112017 there's prolly a better way to do this 
 import sys
@@ -169,7 +170,7 @@ def RouteCalcCore(request):
 
     if (len(allData["features"]) > 0):
         wayPointCalcResponseStr = getNodeJSWayPoints(allData, [startPointCoord, endPointCoord])
-        print(wayPointCalcResponseStr)
+        # print(wayPointCalcResponseStr)
 
         wayPointsReceived = json.loads(wayPointCalcResponseStr)
         wayPointsCoordsArray = [[gjWayPoint["geometry"]["coordinates"][1], gjWayPoint["geometry"]["coordinates"][0]] for gjWayPoint in wayPointsReceived] 
@@ -189,8 +190,16 @@ def RouteCalcCore(request):
     # getRouteUsingBingAPI(snappedPointsCoordsArray, startPointCoord, endPointCoord)
 
     responseDict = {"waypoints": wayPointsGeoJSONDictArray}
+
     if ("includeData" in requestDict.keys()):
-        responseDict["data"] = allData["features"]
+        if len(allData["features"]) > 2500:
+            dataIndices = random.sample(range(1, len(allData["features"])), 2500)
+            responseDict["data"] = []
+            for index in dataIndices:
+                responseDict["data"].append(allData["features"][index])
+
+        else:
+            responseDict["data"] = allData["features"]
 
     responseDict["numberPointsUsed"] = len(allData["features"])
 
