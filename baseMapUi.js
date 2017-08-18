@@ -1,11 +1,11 @@
 var map;
 var directionsManager;
 var bingMapsAPIKey = 'AgMjWLP7S38Z3JsJph1CbM45mCskgfNLhkkv3L3SZtpFz35Wvxjvs3r9NJxxUqXf';
-var routeCalcUrl = "https://routecalculator.herokuapp.com/routeCalc/";
+//var routeCalcUrl = "https://routecalculator.herokuapp.com/routeCalc/";
 var sourceAutocomplete;
 var destAutocomplete;
 
-// var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
+var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
 
 var oldRouteCoords = [];
 var actualWayPoints = [];
