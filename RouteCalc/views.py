@@ -29,20 +29,31 @@ def getWalkingNetworkGraph(boundingBox):
     ox.config(log_file=True, log_console=True, use_cache=True)
 
     # get the walking network for the bounding box 
-    north = min(boundingBox[0][0], boundingBox[1][0]) # min of lats 
-    south = max(boundingBox[0][0], boundingBox[1][0]) # max of lats 
+    north = max(boundingBox[0][0], boundingBox[1][0]) # min of lats 
+    south = min(boundingBox[0][0], boundingBox[1][0]) # max of lats 
     east = max(boundingBox[0][1], boundingBox[1][1]) # max of lons
     west = min(boundingBox[0][1], boundingBox[1][1]) # min of lons
 
     G = ox.graph_from_bbox(north=north, south=south, east=east, west=west, network_type='walk')
-    fig, ax = ox.plot_graph(G)
+    #fig, ax = ox.plot_graph(G)
     return G
 
-def getLeastCostPath(graph):
-    return nx.shortest_path(graph,source=0,target=4)
+def getLeastCostPath(graph, startLat, startLong, endLat, endLong):
+    startNode = getNodeFromLocation(graph, startLat, startLong)
+    endNode = getNodeFromLocation(graph, endLat, endLong)
 
+    return nx.shortest_path(graph, startNode, endNode) # need to specify source and target by node index 
 
+def modifyGraphWithCosts(graph):
+    return
 
+def getNodeFromLocation(graph, lat, long):
+    eps = 0.01
+    for node, data in graph.nodes_iter(data=True): 
+        if abs(data['x'] - long) < eps:
+            if abs(data['y'] - lat) < eps:
+                return node
+    return -1
 
 # issue-manigu-06112017 remove csrf exempt
 # issue-manigu-06112017 using post for now, might want to make this a get?
@@ -99,9 +110,11 @@ def RouteCalcCore(request):
     print(boundingBox)
     print(allData)
 
-
-    getWalkingNetworkGraph(boundingBox)
+    graph = getWalkingNetworkGraph(boundingBox)
+    
+    print("Least cost path") 
+    print(getLeastCostPath(graph, startLatitude, startLongitude, endLatitude, endLongitude))
 
     print("Finished doing all the graph generation stuff")
     
-    return
+    return JsonResponse({})
