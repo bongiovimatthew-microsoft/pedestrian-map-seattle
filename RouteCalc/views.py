@@ -45,9 +45,9 @@ def getLeastCostPath(graph, startLat, startLong, endLat, endLong):
     return nx.shortest_path(graph, startNode, endNode) # need to specify source and target by node index 
 
 def edgeCostFromDataPoint(graph, edge, point):
-    startNode = graph.get_node_attributes(edge[0])
-    endNode = graph.get_node_attributes(edge[1])
-    eps = 0.001
+    startNode = nx.get_node_attributes(graph, edge[0])
+    endNode = nx.get_node_attributes(graph, edge[1])
+    eps = 0.003
     point_to_line_distance = abs( (endNode['y'] - startNode['y']) * point['x']  -  (endNode['x'] - startNode['x']) * point['y']  +  endNode['x'] * startNode['y']  - endNode['y'] * startNode['x'])/sqrt( math.pow((endNode['y'] - startNode['y']), 2) + math.pow((endNode['x'] - startNode['x']), 2) )
 
     if point_to_line_distance < eps: 
@@ -56,14 +56,22 @@ def edgeCostFromDataPoint(graph, edge, point):
     return 0
 
 def modifyGraphWithCosts(graph, datapoints):
-    for edge, data in graph.edges_iter(data=True):
-        for point in datapoints: 
+    for edge in graph.edges_iter(data=True):
+        data = edge[2]
+        data['total_cost'] = 0
+        print(data)
+        for feature in datapoints['features']: 
+            point = {}
+            point['x'] = feature['geometry']['coordinates'][1]
+            point['y'] = feature['geometry']['coordinates'][0]
+            point['cost'] = feature['properties']['score']
+
             data['total_cost'] += edgeCostFromDataPoint(graph, edge, point)
         # edge --> 'length'
     return
 
 def getNodeFromLocation(graph, lat, long):
-    eps = 0.01
+    eps = 0.003
     for node, data in graph.nodes_iter(data=True): 
         if abs(data['x'] - long) < eps:
             if abs(data['y'] - lat) < eps:
@@ -127,7 +135,7 @@ def RouteCalcCore(request):
 
     graph = getWalkingNetworkGraph(boundingBox)
 
-
+    modifyGraphWithCosts(graph, allData)
 
     print("Least cost path") 
     print(getLeastCostPath(graph, startLatitude, startLongitude, endLatitude, endLongitude))
