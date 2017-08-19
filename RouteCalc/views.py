@@ -90,6 +90,30 @@ def edgeCostFromDataPoint(graph, edge, point):
     return 0
 
 #
+# Generate a GeoJSON path from a set of nodes in the given graph
+#
+# Parameters: 
+#   path - a set of edge IDs 
+#   graph - the graph with the full node context 
+# 
+# Return: 
+#   A GeoJSON blob for the path 
+#
+def getGeoJsonFromPath(path, graph):
+    node_features = []
+    all_coords = []
+    for pathnode in path:
+        for node, data in graph.nodes_iter(data=True):  
+            if node == pathnode: 
+                node_features.append({"type": "Feature", "geometry": {"type": "Point", "coordinates": [data['x'], data['y']]}}) #long, lat
+                all_coords.append([data['x'], data['y']])
+                break
+    geoJson = {"type": "FeatureCollection", "features": node_features }
+    geoJsonLine = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "LineString", "coordinates": all_coords}}]}
+
+    return geoJsonLine
+
+#
 # Modify the edges of a graph with costs based on the supplied datapoints 
 #
 # Parameters: 
@@ -203,19 +227,11 @@ def RouteCalcCore(request):
 
     allData = aggregator.GetAllCleanData(dateRange, boundingBox, knobWeights)    
 
-    print(allData)
-
     graph = getWalkingNetworkGraph(boundingBox)
-
     graph = modifyGraphWithCosts(graph, allData)
 
-    for edge in graph.edges_iter(data=True, keys=True):
-        print(edge)
-
-    print("Least cost path") 
     path = getLeastCostPath(graph, startLatitude, startLongitude, endLatitude, endLongitude) 
-    print(path)
 
-    print("Finished doing all the graph generation stuff")
-    
+    geoJsonPath = getGeoJsonFromPath(path, graph)
+    print(geoJsonPath)
     return JsonResponse({})
