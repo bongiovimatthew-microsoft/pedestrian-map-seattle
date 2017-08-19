@@ -7,6 +7,7 @@ import urllib.request
 import urllib.parse
 import osmnx as ox 
 import networkx as nx
+import math
 
 # issue-manish-06112017 there's prolly a better way to do this 
 import sys
@@ -42,13 +43,14 @@ def getLeastCostPath(graph, startLat, startLong, endLat, endLong):
     startNode = getNodeFromLocation(graph, startLat, startLong)
     endNode = getNodeFromLocation(graph, endLat, endLong)
 
-    return nx.shortest_path(graph, startNode, endNode) # need to specify source and target by node index 
+    return nx.shortest_path(graph, startNode, endNode, weight='total_cost') # need to specify source and target by node index 
 
 def edgeCostFromDataPoint(graph, edge, point):
-    startNode = nx.get_node_attributes(graph, edge[0])
-    endNode = nx.get_node_attributes(graph, edge[1])
-    eps = 0.003
-    point_to_line_distance = abs( (endNode['y'] - startNode['y']) * point['x']  -  (endNode['x'] - startNode['x']) * point['y']  +  endNode['x'] * startNode['y']  - endNode['y'] * startNode['x'])/sqrt( math.pow((endNode['y'] - startNode['y']), 2) + math.pow((endNode['x'] - startNode['x']), 2) )
+    startNode = graph.node[edge[0]] 
+    endNode = graph.node[edge[1]]  
+    eps = 50
+
+    point_to_line_distance = abs( (endNode['y'] - startNode['y']) * point['x']  -  (endNode['x'] - startNode['x']) * point['y']  +  endNode['x'] * startNode['y']  - endNode['y'] * startNode['x'])/ math.sqrt( math.pow((endNode['y'] - startNode['y']), 2) + math.pow((endNode['x'] - startNode['x']), 2) )
 
     if point_to_line_distance < eps: 
         return point['cost']
@@ -56,19 +58,23 @@ def edgeCostFromDataPoint(graph, edge, point):
     return 0
 
 def modifyGraphWithCosts(graph, datapoints):
-    for edge in graph.edges_iter(data=True):
-        data = edge[2]
-        data['total_cost'] = 0
-        print(data)
+    for edge in graph.edges_iter(data=True, keys=True):
+        total_cost = 0
+        
         for feature in datapoints['features']: 
             point = {}
             point['x'] = feature['geometry']['coordinates'][1]
             point['y'] = feature['geometry']['coordinates'][0]
             point['cost'] = feature['properties']['score']
 
-            data['total_cost'] += edgeCostFromDataPoint(graph, edge, point)
-        # edge --> 'length'
-    return
+            total_cost += edgeCostFromDataPoint(graph, edge, point)
+        
+        # Use the add_edge function with the correct key (edge[2]) to update the edge to include the total_cost attr
+        if total_cost != 0:
+            total_cost *= -1.0
+        graph.add_edge(edge[0], edge[1], edge[2], total_cost = total_cost)
+
+    return graph
 
 def getNodeFromLocation(graph, lat, long):
     eps = 0.003
@@ -135,7 +141,10 @@ def RouteCalcCore(request):
 
     graph = getWalkingNetworkGraph(boundingBox)
 
-    modifyGraphWithCosts(graph, allData)
+    graph = modifyGraphWithCosts(graph, allData)
+
+    for edge in graph.edges_iter(data=True, keys=True):
+        print(edge)
 
     print("Least cost path") 
     print(getLeastCostPath(graph, startLatitude, startLongitude, endLatitude, endLongitude))
