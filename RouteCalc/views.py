@@ -52,12 +52,13 @@ def edgeCostFromDataPoint(graph, edge, point):
 
     if point_to_line_distance < eps: 
         return point['cost']
-        
+
     return 0
 
-def modifyGraphWithCosts(graph, data):
+def modifyGraphWithCosts(graph, datapoints):
     for edge, data in graph.edges_iter(data=True):
-        data['total_cost'] = edgeCostFromDataPoint(graph, edge, point)
+        for point in datapoints: 
+            data['total_cost'] += edgeCostFromDataPoint(graph, edge, point)
         # edge --> 'length'
     return
 
