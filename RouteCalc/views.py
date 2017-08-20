@@ -234,4 +234,19 @@ def RouteCalcCore(request):
 
     geoJsonPath = getGeoJsonFromPath(path, graph)
     print(geoJsonPath)
-    return JsonResponse({})
+
+    responseDict = {"path": geoJsonPath}
+
+    if ("includeData" in requestDict.keys()):
+        if len(allData["features"]) > 2500:
+            dataIndices = random.sample(range(1, len(allData["features"])), 2500)
+            responseDict["data"] = []
+            for index in dataIndices:
+                responseDict["data"].append(allData["features"][index])
+
+        else:
+            responseDict["data"] = allData["features"]
+
+    responseDict["numberPointsUsed"] = len(allData["features"])
+
+    return JsonResponse(responseDict)
