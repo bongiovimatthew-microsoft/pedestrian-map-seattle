@@ -82,7 +82,11 @@ def edgeCostFromDataPoint(graph, edge, point):
     endNode = graph.node[edge[1]]  
     eps = 50
 
-    point_to_line_distance = abs( (endNode['y'] - startNode['y']) * point['x']  -  (endNode['x'] - startNode['x']) * point['y']  +  endNode['x'] * startNode['y']  - endNode['y'] * startNode['x'])/ math.sqrt( math.pow((endNode['y'] - startNode['y']), 2) + math.pow((endNode['x'] - startNode['x']), 2) )
+    denom = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (endNode['x'], endNode['y']))
+    if denom == 0: 
+        denom = 0.00000000001
+
+    point_to_line_distance = abs( (endNode['y'] - startNode['y']) * point['x']  -  (endNode['x'] - startNode['x']) * point['y']  +  endNode['x'] * startNode['y']  - endNode['y'] * startNode['x']) / denom
 
     if point_to_line_distance < eps: 
         return point['cost']
@@ -141,7 +145,7 @@ def modifyGraphWithCosts(graph, datapoints):
             total_cost += edgeCostFromDataPoint(graph, edge, point)
         
         # Adjust edge costs to be positive (Dijkstra's implementation doesn't want negative)
-        if total_cost != 0:
+        if total_cost < 0:
             total_cost *= -1.0
 
         # Use the add_edge function to update the current edge with the total_cost attribute    

@@ -10,8 +10,18 @@ var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
 var centerLatToUse = 47.606209
 var centerLongToUse = -122.332071
 
+function ClearMap(){
+    try{
+        map.removeSource("route");
+        map.removeLayer("route");
+        map.removeSource("data");
+        map.removeLayer("data");
+    }
+    catch(err){
+    }    
+}
+
 function DisplayNewRoute(response){
-    var pushpins = [];
 
     map.addLayer({
         "id": "route",
@@ -29,39 +39,76 @@ function DisplayNewRoute(response){
             "line-width": 8
         }
     });
+
+    // Pass the first coordinates in the LineString to `lngLatBounds` &
+    // wrap each coordinate pair in `extend` to include them in the bounds
+    // result. A variation of this technique could be applied to zooming
+    // to the bounds of multiple Points or Polygon geomteries - it just
+    // requires wrapping all the coordinates with the extend method.
+    var coordinates = response.path.features[0].geometry.coordinates;
+    var bounds = coordinates.reduce(function(bounds, coord) {
+        return bounds.extend(coord);
+    }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+    map.fitBounds(bounds, {
+        padding: 20
+    });
                 
     // If we are displaying the data, go through the data in the response, and create 
     //  pushpins for everything 
     if(document.getElementById("show-data-switch").checked){
-        var dataPointsToUse = response.data;         
-        for (var i = 0; i < dataPointsToUse.length; ++i) {
-            dp = dataPointsToUse[i];
+        var pushpins = [];
+        
+        var dataPointsToUse = response.data;    
 
-            //Create custom Pushpin
-            var pointLoc = new Microsoft.Maps.Location(dp["geometry"]["coordinates"][1], dp["geometry"]["coordinates"][0]);
-            var color = 'green'
-            if (dp["properties"]["knob"] == "Accessibility") {
-                color = 'blue';
+        knob_strings = [];
+        if (document.getElementById("safety-switch").checked) knob_strings.push("Safety");
+        if (document.getElementById("accessibility-switch").checked) knob_strings.push("Accessibility");
+        if (document.getElementById("nature-switch").checked) knob_strings.push("Nature");
+        if (document.getElementById("toilet-switch").checked) knob_strings.push("Toilets");
+
+        for (var i = 0; i < dataPointsToUse.length; ++i) {
+            point_feature = dataPointsToUse[i];
+
+            if(!knob_strings.includes(point_feature["properties"]["knob"])){
+                continue;
             }
-            else if (dp["properties"]["knob"] == "Safety") {
-                color = 'orange';
+
+            // Add color to pushpins
+            if (point_feature["properties"]["knob"] == "Accessibility") {
+                point_feature["properties"]["color"] = 'blue';
             }
-            else if (dp["properties"]["knob"] == "Nature") {
-                color = 'green';
+            else if (point_feature["properties"]["knob"] == "Safety") {
+                point_feature["properties"]["color"] = 'orange';
             }
-            else if (dp["properties"]["knob"] == "Toilets") {
-                color = 'yellow';
+            else if (point_feature["properties"]["knob"] == "Nature") {
+                point_feature["properties"]["color"] = 'green';
             }
-            var pin = new Microsoft.Maps.Pushpin(pointLoc, {
-                color: color
-            });
-            pushpins.push(pin);
+            else if (point_feature["properties"]["knob"] == "Toilets") {
+                point_feature["properties"]["color"] = 'yellow';
+            }
+            
+            pushpins.push(point_feature);
         }
 
+        data = {"type": "FeatureCollection", "features": pushpins}
+
         // add the pushpins data
-        var layer = new Microsoft.Maps.Layer();
-        layer.add(pushpins);
-        map.layers.insert(layer);
+        map.addLayer({
+            'id': 'data',
+            'type': 'circle',
+            'source': { 
+                'type': 'geojson', 
+                'data': data
+            },
+            'layout': {
+                'visibility': 'visible'
+            },
+            'paint': {
+                'circle-radius': 8,
+                'circle-color': { property: 'color', type: 'categorical', stops: [['green', '#006600'], ['orange', '#FFA500'], ['blue', '#0000FF'], ['yellow', '#FFFF00']]}
+            }            
+        });
     }
 
     if (response.numberPointsUsed == 0) {
@@ -81,6 +128,9 @@ function DisplayNewRoute(response){
 function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocation, startWaypointAddress, endWaypointAddress){
     console.log("Enter: CalculateDirectionsForNewRoute");
 	
+    // Clear any existing data/route from the map
+    ClearMap();
+
     // Get the chosen knobs 
 	var knobs = { "Safety": 0, "Accessibility": 0, "Nature": 0, "Toilets": 0 }		
 	if (document.getElementById("safety-switch").checked) knobs.Safety = 1;
