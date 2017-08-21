@@ -51,7 +51,7 @@ function DisplayNewRoute(response){
     }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
 
     map.fitBounds(bounds, {
-        padding: 20
+        padding: 60
     });
                 
     // If we are displaying the data, go through the data in the response, and create 
