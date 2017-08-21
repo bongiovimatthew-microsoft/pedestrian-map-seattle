@@ -33,6 +33,13 @@ class DataAggregator():
 
         # TODO: Call each cleaner in a separate thread 
         for cleaner in self.allCleaners:
+            
+            # Don't call the cleaners we know we won't need 
+            if cleaner[1] not in knobWeights.keys():
+                continue
+            if knobWeights[cleaner[1]] == 0:
+                continue
+            
             cleanerName = eval(cleaner[0])()
             cleanerData = cleanerName.GetData(dateRange, boundingBox)
             cleanerPoints = cleanerData["features"]

@@ -234,7 +234,7 @@ def RouteCalcCore(request):
     graph = getWalkingNetworkGraph(boundingBox)
     graph = modifyGraphWithCosts(graph, allData)
 
-    path = getLeastCostPath(graph, startLatitude, startLongitude, endLatitude, endLongitude) 
+    path = getLeastCostPath(graph, requestDict['startLatitude'], requestDict['startLongitude'], requestDict['endLatitude'], requestDict['endLongitude']) 
 
     geoJsonPath = getGeoJsonFromPath(path, graph)
     print(geoJsonPath)
