@@ -9,6 +9,7 @@ var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
 
 var centerLatToUse = 47.606209
 var centerLongToUse = -122.332071
+var anyKnobsSelected = false;
 
 function ClearMap(){
     try{
@@ -138,7 +139,7 @@ function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocati
 	if (document.getElementById("nature-switch").checked) knobs.Nature = 1;
 	if (document.getElementById("toilet-switch").checked) knobs.Toilets = 1;
 
-    var anyKnobsSelected = false
+    anyKnobsSelected = false
     Object.keys(knobs).forEach(function(currentKey) {
         if (knobs[currentKey] != 0) {
             anyKnobsSelected = true

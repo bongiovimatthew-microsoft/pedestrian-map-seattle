@@ -80,16 +80,25 @@ def getLeastCostPath(graph, startLat, startLong, endLat, endLong):
 def edgeCostFromDataPoint(graph, edge, point):
     startNode = graph.node[edge[0]] 
     endNode = graph.node[edge[1]]  
-    eps = 50
-
+    eps = 0.0001 # About 50 ft (364,000 ft per degree)
+    
+    point_to_line_distance = 0
     denom = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (endNode['x'], endNode['y']))
     if denom == 0: 
-        denom = 0.00000000001
+        # The current edge starts and ends at the same point
+        #  If that's the case, just get the distance between the current point and the edge point
+        point_to_line_distance = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (point['x'], point['y']))
+    else: 
+        point_to_line_distance = abs( (endNode['x'] - startNode['x']) * (startNode['y'] - point['y']) - (startNode['x'] - point['x']) * (endNode['y'] - startNode['y']) ) / denom
+    
+    # If the current point lies exactly on the edge, set a minimum distance for division to work 
+    if point_to_line_distance == 0:
+        point_to_line_distance = 0.00001
 
-    point_to_line_distance = abs( (endNode['y'] - startNode['y']) * point['x']  -  (endNode['x'] - startNode['x']) * point['y']  +  endNode['x'] * startNode['y']  - endNode['y'] * startNode['x']) / denom
-
+    # If the current point distance is under our epsilon, apply the cost 
+    #  decayed over the square of the distance 
     if point_to_line_distance < eps: 
-        return point['cost']
+        return point['cost'] #(point['cost'] / (point_to_line_distance ** 2))
 
     return 0
 
@@ -129,6 +138,10 @@ def getGeoJsonFromPath(path, graph):
 #
 def modifyGraphWithCosts(graph, datapoints):
 
+    min_score = 1000000000
+    max_score = -1000000000
+    max_dist = 0
+
     # Iterate through every edge in the graph, and apply 
     #  the appropriate point weight to the edge cost 
     for edge in graph.edges_iter(data=True, keys=True):
@@ -138,18 +151,32 @@ def modifyGraphWithCosts(graph, datapoints):
         #  weight on the current edge 
         for feature in datapoints['features']: 
             point = {}
-            point['x'] = feature['geometry']['coordinates'][1]
-            point['y'] = feature['geometry']['coordinates'][0]
+            point['x'] = feature['geometry']['coordinates'][0] #long
+            point['y'] = feature['geometry']['coordinates'][1] #lat
             point['cost'] = feature['properties']['score']
 
             total_cost += edgeCostFromDataPoint(graph, edge, point)
-        
-        # Adjust edge costs to be positive (Dijkstra's implementation doesn't want negative)
-        if total_cost < 0:
-            total_cost *= -1.0
 
         # Use the add_edge function to update the current edge with the total_cost attribute    
         graph.add_edge(edge[0], edge[1], edge[2], total_cost = total_cost)
+
+        if total_cost < min_score: 
+            min_score = total_cost 
+        if total_cost > max_score: 
+            max_score = total_cost 
+
+        edge_dist = edge[3]['length']
+        if edge_dist > max_dist: 
+            max_dist = edge_dist 
+
+    # Scale the edge weights to be all positive 
+    scale_val = abs(max_score - min_score) + min_score
+    for edge in graph.edges_iter(data=True, keys=True):
+        scaled_cost = scale_val - edge[3]['total_cost']
+
+        # Scale the distance to be between 0 and 1, and then make it half as important as the scaled cost
+        scaled_dist = (edge[3]['length'] / max_dist ) / 2 
+        graph.add_edge(edge[0], edge[1], edge[2], total_cost = scaled_cost + scaled_dist) 
 
     return graph
 
@@ -168,14 +195,14 @@ def modifyGraphWithCosts(graph, datapoints):
 #
 def getNodeFromLocation(graph, lat, lon):
     closest_node = 0
-    min_distance = -1
+    min_distance = 100000000
 
     for node, data in graph.nodes_iter(data=True): 
         point1 = [data['x'], data['y']]
         point2 = [lon, lat]
         distance = getDistanceBetweenTwoPoints(point1, point2)
         
-        if min_distance == -1 or distance < min_distance: 
+        if distance < min_distance: 
             min_distance = distance
             closest_node = node 
 
