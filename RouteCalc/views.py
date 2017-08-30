@@ -10,6 +10,7 @@ import networkx as nx
 import math
 import sys
 from DataCleaners import DataAggregator
+from RouteCalc import DirectionsManager
 
 GOOGLE_API_KEY = 'AIzaSyDhdh1eXucfnK3EytcFAqTd7rt8-y9N7bw';
 
@@ -102,137 +103,6 @@ def edgeCostFromDataPoint(graph, edge, point):
 
     return 0
 
-def getAngleBetweenVectors(vector1, vector2):
-    # dotProduct = x1*x2 + y1y*2
-    dotProduct = vector1[0] * vector2[0] + vector1[1]*vector2[1]
-    # determinant = x1*y2 - y1*x2
-    determinant = vector1[0] * vector2[1] - vector1[1]*vector2[0]
-    # magnitude1 = (vector1[0] ** 2 + vector1[1] ** 2) ** 0.5
-    # magnitude2 = (vector2[0] ** 2 + vector2[1] ** 2) ** 0.5
-    # denom = magnitude1 * magnitude2
-    # return (180 / math.pi) * math.acos(dotProduct/denom)
-    # alpha = math.atan2(vector1[1], vector1[0])
-    # print(alpha)
-    # beta = math.atan2(vector2[1], vector2[0])
-    # print(beta)
-    return (180 / math.pi) * math.atan2(determinant, dotProduct)
-
-def getAngleBetweenPoints(point1, point2):
-    vector = (point2[0] - point1[0], point2[1] - point1[1])
-    return (180 / math.pi) * math.atan2(vector[1], vector[0])
-
-def getNodeDataFromId(myNode, graph):
-    for node, data in graph.nodes_iter(data=True):  
-            if node == myNode:
-                return node, data 
-        
-def getDirectionStringFromAngle(angle):
-    # The angle is between the positive X axis (first vector) and the vector
-    if 20 <= angle <= 160:
-        return "Left"
-    elif -160 <= angle <= -20:
-        return "Right"
-    elif -20 <= angle <= 20:
-        return "Straight"
-    elif (160 <= angle <= 180) or (-180 <= angle <= -160):
-        return "Back"
-
-def cleanDirections(directions):
-    #
-    # First, iterate through all the directions and combine consecutive "straight" directions 
-    #
-    for index, currentDirection in enumerate(directions):
-        if index < len(directions) - 1:
-            nextDirection = directions[index + 1]
-
-            while (nextDirection['nextDirection'] == "Straight" == currentDirection['nextDirection']) and (nextDirection['nextName'] == currentDirection['nextName']):
-                # Replace with a single, combined direction 
-                direction_data = { "node": [currentDirection['node'], nextDirection['node']], "nextName": currentDirection['nextName'], "nextDirection": "Straight", "nextVectorAngle": 0, "nextLength": nextDirection['nextLength'] + currentDirection['nextLength'] }
-                del directions[index + 1]
-                del directions[index]
-                directions.insert(index, direction_data)
-                currentDirection = nextDirection 
-                nextDirection = directions[index + 1]
-
-    #
-    # Next, iterate through all the directions again and update the direction names 
-    #        
-    for index, currentDirection in enumerate(directions):
-        if index == 0: 
-            full_direction = "Start on " + currentDirection['nextName']
-            currentDirection['nextDirection'] = full_direction
-            continue
-
-        previousDirection = directions[index - 1]
-        prefix = "Turn"
-        if currentDirection['nextDirection'].strip().lower() == "straight":
-            prefix = "Continue"
-
-        if previousDirection['nextName'].strip().lower() != currentDirection['nextName'].strip().lower():            
-            full_direction = prefix + " " + currentDirection['nextDirection'] + " onto " + currentDirection['nextName']
-        else: 
-            full_direction = prefix + " " + currentDirection['nextDirection'] + " to stay on " + currentDirection['nextName']    
-
-        currentDirection['nextDirection'] = full_direction
-
-    return directions
-
-def getDirectionsForPath(path, graph):
-
-    directions = []
-
-    # The path is given as a set of nodes from the destination to the source, so we reverse
-    #  the list when generating the directions 
-    path = list(reversed(path))
-    for index, pathnode in enumerate(path):
-        currentNode, currentNodeData = getNodeDataFromId(pathnode, graph)
-
-        edgeName = ""
-        edgeLength = 0
-        angle = -1
-        vectorAngle = -1
-
-        if index < len(path) - 1:
-            nextNode, nextNodeData = getNodeDataFromId(path[index + 1], graph)
-            
-            # Get the edge between current node and next node 
-            edge = graph.get_edge_data(currentNode, nextNode)
-            if 'name' in edge[0]: 
-                edgeName = edge[0]['name']
-            if 'length' in edge[0]:
-                edgeLength = edge[0]['length']
-                        
-
-            if index < len(path) - 2:
-                twoNextNode, twoNextNode = getNodeDataFromId(path[index + 2], graph)
-
-                edge2 = graph.get_edge_data(nextNode, twoNextNode['osmid'])
-                if 'name' in edge2[0]: 
-                    edge2Name = edge2[0]['name']
-                if 'length' in edge2[0]:
-                    edge2Length = edge2[0]['length']
-
-                if index == 0:
-                    # Add the starting direction 
-                    direction_data = { "node": currentNode, "nextName": edgeName, "nextDirection": "Start", "nextVectorAngle": 0, "nextLength": edgeLength }
-                    directions.append(direction_data)
-                    continue
-                    
-                firstVector = (nextNodeData['x'] - currentNodeData['x'], nextNodeData['y'] - currentNodeData['y'])
-                secondVector = (twoNextNode['x'] - nextNodeData['x'], twoNextNode['y'] - nextNodeData['y'])
-                vectorAngle = getAngleBetweenVectors(firstVector, secondVector)
-
-                direction_data = { "node": currentNode, "nextName": edge2Name, "nextDirection": getDirectionStringFromAngle(vectorAngle), "nextVectorAngle": vectorAngle, "nextLength": edge2Length }
-                directions.append(direction_data)
-                continue
-
-            direction_data = { "node": currentNode, "nextName": edgeName, "nextDirection": getDirectionStringFromAngle(vectorAngle), "nextVectorAngle": vectorAngle, "nextLength": edgeLength }
-            directions.append(direction_data)
-
-    directions = cleanDirections(directions)
-    return directions
-
-
 
 #
 # Generate a GeoJSON path from a set of nodes in the given graph
@@ -256,8 +126,6 @@ def getGeoJsonFromPath(path, graph):
                 break
     geoJson = {"type": "FeatureCollection", "features": node_features }
     geoJsonLine = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "LineString", "coordinates": all_coords}}]}
-
-    print(geoJson)
 
     return geoJsonLine
 
@@ -397,14 +265,11 @@ def RouteCalcCore(request):
     graph = modifyGraphWithCosts(graph, allData)
 
     path = getLeastCostPath(graph, requestDict['startLatitude'], requestDict['startLongitude'], requestDict['endLatitude'], requestDict['endLongitude']) 
-    print(path)
-
     geoJsonPath = getGeoJsonFromPath(path, graph)
-    print(geoJsonPath)
 
-    directions = getDirectionsForPath(path, graph)
+    directionsMan = DirectionsManager.DirectionsManager()
+    directions = directionsMan.getDirectionsForPath(path, graph)
     print(directions)
-
     responseDict = {"path": geoJsonPath}
 
     if ("includeData" in requestDict.keys()):
@@ -418,5 +283,6 @@ def RouteCalcCore(request):
             responseDict["data"] = allData["features"]
 
     responseDict["numberPointsUsed"] = len(allData["features"])
+    responseDict["directions"] = directions
 
     return JsonResponse(responseDict)
