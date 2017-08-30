@@ -137,6 +137,46 @@ def getDirectionStringFromAngle(angle):
     elif (160 <= angle <= 180) or (-180 <= angle <= -160):
         return "Back"
 
+def cleanDirections(directions):
+    #
+    # First, iterate through all the directions and combine consecutive "straight" directions 
+    #
+    for index, currentDirection in enumerate(directions):
+        if index < len(directions) - 1:
+            nextDirection = directions[index + 1]
+
+            while (nextDirection['nextDirection'] == "Straight" == currentDirection['nextDirection']) and (nextDirection['nextName'] == currentDirection['nextName']):
+                # Replace with a single, combined direction 
+                direction_data = { "node": [currentDirection['node'], nextDirection['node']], "nextName": currentDirection['nextName'], "nextDirection": "Straight", "nextVectorAngle": 0, "nextLength": nextDirection['nextLength'] + currentDirection['nextLength'] }
+                del directions[index + 1]
+                del directions[index]
+                directions.insert(index, direction_data)
+                currentDirection = nextDirection 
+                nextDirection = directions[index + 1]
+
+    #
+    # Next, iterate through all the directions again and update the direction names 
+    #        
+    for index, currentDirection in enumerate(directions):
+        if index == 0: 
+            full_direction = "Start on " + currentDirection['nextName']
+            currentDirection['nextDirection'] = full_direction
+            continue
+
+        previousDirection = directions[index - 1]
+        prefix = "Turn"
+        if currentDirection['nextDirection'].strip().lower() == "straight":
+            prefix = "Continue"
+
+        if previousDirection['nextName'].strip().lower() != currentDirection['nextName'].strip().lower():            
+            full_direction = prefix + " " + currentDirection['nextDirection'] + " onto " + currentDirection['nextName']
+        else: 
+            full_direction = prefix + " " + currentDirection['nextDirection'] + " to stay on " + currentDirection['nextName']    
+
+        currentDirection['nextDirection'] = full_direction
+
+    return directions
+
 def getDirectionsForPath(path, graph):
 
     directions = []
@@ -165,13 +205,7 @@ def getDirectionsForPath(path, graph):
 
             if index < len(path) - 2:
                 twoNextNode, twoNextNode = getNodeDataFromId(path[index + 2], graph)
-                print("")
-                print("")
-                print("")
-                print("**************")
-                print(currentNode)
-                print(nextNode)
-                print(twoNextNode)
+
                 edge2 = graph.get_edge_data(nextNode, twoNextNode['osmid'])
                 if 'name' in edge2[0]: 
                     edge2Name = edge2[0]['name']
@@ -195,6 +229,7 @@ def getDirectionsForPath(path, graph):
             direction_data = { "node": currentNode, "nextName": edgeName, "nextDirection": getDirectionStringFromAngle(vectorAngle), "nextVectorAngle": vectorAngle, "nextLength": edgeLength }
             directions.append(direction_data)
 
+    directions = cleanDirections(directions)
     return directions
 
 
