@@ -15,14 +15,49 @@ function ClearMap(){
     try{
         map.removeSource("route");
         map.removeLayer("route");
+    }
+    catch(err){
+        console.log("Failed to clear map route")
+        console.log(err)
+    }    
+
+    try{
+        map.removeSource("allEdges");
+        map.removeLayer("allEdges");
+    }
+    catch(err){
+        console.log("Failed to clear map all edges")
+        console.log(err)
+    }    
+
+    try{
         map.removeSource("data");
         map.removeLayer("data");
     }
     catch(err){
+        console.log("Failed to clear map data")
+        console.log(err)
     }    
 }
 
+function edgeColor(feature) {
+    total_cost = feature.properties.total_cost;
+    if (total_cost > 1.5) {
+        return "red"
+    } 
+    else if (total_cost > 1.0) {
+        return "orange"
+    } 
+    else if (total_cost > 0.5) {
+        return "green"
+    } 
+    else {
+        return "blue"
+    }
+}
+
 function DisplayNewRoute(response){
+    console.log(response);
 
     map.addLayer({
         "id": "route",
@@ -32,12 +67,13 @@ function DisplayNewRoute(response){
             "data": response.path
         },
         "layout": {
-            "line-join": "round",
-            "line-cap": "round"
+            "line-cap": "round",
+            "line-join": "round"
         },
         "paint": {
             "line-color": "#CD0000",
-            "line-width": 8
+            "line-dasharray": [0,1.5],
+            "line-width": 7
         }
     });
 
@@ -106,10 +142,45 @@ function DisplayNewRoute(response){
                 'visibility': 'visible'
             },
             'paint': {
-                'circle-radius': 8,
+                'circle-radius': 4,
                 'circle-color': { property: 'color', type: 'categorical', stops: [['green', '#006600'], ['orange', '#FFA500'], ['blue', '#0000FF'], ['yellow', '#FFFF00']]}
             }            
         });
+
+        // Display the edges with weights
+        {
+            // Build an array of linestrings for each edge
+            var edgesLines = [];
+            
+            // Build a layer for each feature and push it into the empty array
+            var i;
+            
+            for (i = 0; i < response.allEdges.features.length; i++) {
+                response.allEdges.features[i].properties['color'] = edgeColor(response.allEdges.features[i])
+
+                edgesLines.push(response.allEdges.features[i]);
+            }
+
+            data = {"type": "FeatureCollection", "features": edgesLines}
+
+            // add the pushpins data
+            map.addLayer({
+                'id': 'allEdges',
+                'type': 'line',
+                'source': { 
+                    'type': 'geojson', 
+                    'data': data
+                },
+                'layout': {
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    // 'circle-radius': 8,
+                    'line-color': { property: 'color', type: 'categorical', stops: [['red', '#FF0000'], ['green', '#006600'], ['orange', '#FFA500'], ['blue', '#0000FF'], ['yellow', '#FFFF00']]}
+                }            
+            }); 
+        }        
+
     }
 
     if (response.numberPointsUsed == 0) {
@@ -128,16 +199,16 @@ function DisplayNewRoute(response){
 
 function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocation, startWaypointAddress, endWaypointAddress){
     console.log("Enter: CalculateDirectionsForNewRoute");
-	
+    
     // Clear any existing data/route from the map
     ClearMap();
 
     // Get the chosen knobs 
-	var knobs = { "Safety": 0, "Accessibility": 0, "Nature": 0, "Toilets": 0 }		
-	if (document.getElementById("safety-switch").checked) knobs.Safety = 1;
-	if (document.getElementById("accessibility-switch").checked) knobs.Accessibility = 1;
-	if (document.getElementById("nature-switch").checked) knobs.Nature = 1;
-	if (document.getElementById("toilet-switch").checked) knobs.Toilets = 1;
+    var knobs = { "Safety": 0, "Accessibility": 0, "Nature": 0, "Toilets": 0 }      
+    if (document.getElementById("safety-switch").checked) knobs.Safety = 1;
+    if (document.getElementById("accessibility-switch").checked) knobs.Accessibility = 1;
+    if (document.getElementById("nature-switch").checked) knobs.Nature = 1;
+    if (document.getElementById("toilet-switch").checked) knobs.Toilets = 1;
 
     anyKnobsSelected = false
     Object.keys(knobs).forEach(function(currentKey) {
@@ -146,7 +217,7 @@ function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocati
         }
     });
 
-	// Set the request POST body 
+    // Set the request POST body 
     var params = {"startLatitude" : startWaypointLocation[0],
                   "startLongitude": startWaypointLocation[1],
                   "endLatitude": endWaypointLocation[0] ,
@@ -169,12 +240,12 @@ function CalculateDirectionsForNewRoute(startWaypointLocation, endWaypointLocati
     // Send the proper header information along with the request
     routeCalcReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-	// Define the callback function for when we get a response from the backend
-	//  This response should contain the waypoints to use, and any data to display  
+    // Define the callback function for when we get a response from the backend
+    //  This response should contain the waypoints to use, and any data to display  
     routeCalcReq.onreadystatechange = function() {
         if(routeCalcReq.readyState == 4 && routeCalcReq.status == 200) {
             DisplayNewRoute(JSON.parse(routeCalcReq.responseText));
-		}               
+        }               
     }
     
     // Make the request to the backend to get the waypoints, and any data 
