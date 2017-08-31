@@ -122,9 +122,60 @@ def getGeoJsonFromPath(path, graph):
                 all_coords.append([data['x'], data['y']])
                 break
     geoJson = {"type": "FeatureCollection", "features": node_features }
-    geoJsonLine = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "LineString", "coordinates": all_coords}}]}
+    geoJsonLine = {
+        "type": "FeatureCollection",
+        "features": 
+        [
+            {
+                "type": "Feature",
+                "geometry": 
+                {
+                    "type": "LineString", 
+                    "coordinates": all_coords
+                }
+            }
+        ]
+    }
+
 
     return geoJsonLine
+
+#
+# Generate a GeoJSON feature collection for all edges with total_cost
+#
+# Parameters: 
+#   graph - the graph with the full node context 
+# 
+# Return: 
+#   A GeoJSON blob for all the edges 
+#
+def getGeoJsonForAllEdges(graph):
+    edgeDictArray = []
+
+    for edge in graph.edges_iter(data=True, keys=True):
+        edgeEntry = {
+                "type": "Feature",
+                "geometry": 
+                {
+                    "type": "LineString", 
+                    "coordinates": [
+                        [graph.node[edge[0]]['x'], graph.node[edge[0]]['y']],
+                        [graph.node[edge[1]]['x'], graph.node[edge[1]]['y']]
+                    ]
+                },
+                "properties": {
+                    "total_cost": edge[3]['total_cost']
+                }
+            }
+
+        edgeDictArray.append(edgeEntry)
+
+    geoJsonAllEdges = {
+        "type": "FeatureCollection",
+        "features": edgeDictArray
+    }
+
+    return geoJsonAllEdges
 
 #
 # Modify the edges of a graph with costs based on the supplied datapoints 
@@ -172,7 +223,14 @@ def modifyGraphWithCosts(graph, datapoints):
     # Scale the edge weights to be all positive 
     scale_val = abs(max_score - min_score) + min_score
     for edge in graph.edges_iter(data=True, keys=True):
-        scaled_cost = scale_val - edge[3]['total_cost']
+        scoreToDivideBy = max_score
+        if (scoreToDivideBy == 0) :
+            if (abs(min_score) == 0):
+                scoreToDivideBy = 1
+            else:
+                scoreToDivideBy = abs(min_score)
+
+        scaled_cost = (scale_val - edge[3]['total_cost']) / scoreToDivideBy
 
         # Scale the distance to be between 0 and 1, and then make it half as important as the scaled cost
         scaled_dist = (edge[3]['length'] / max_dist ) / 2 
@@ -277,6 +335,10 @@ def RouteCalcCore(request):
 
         else:
             responseDict["data"] = allData["features"]
+
+        geoJsonAllEdges = getGeoJsonForAllEdges(graph)
+        print(geoJsonAllEdges)
+        responseDict["allEdges"] = geoJsonAllEdges
 
     responseDict["numberPointsUsed"] = len(allData["features"])
 
