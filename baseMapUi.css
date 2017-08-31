@@ -454,9 +454,13 @@ h5{
   margin-left: 0.5em;
 }
 
+#directionsPanel{
+    padding-left: 15px;
+}
+
 td {
     border: 2px solid black;
-    padding-left: 15px;
+    padding-left: 30px;
 }
 table{
     padding-left: 15px;

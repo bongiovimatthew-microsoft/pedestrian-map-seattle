@@ -201,7 +201,8 @@ class DirectionsManager():
                             
                 if index == 0:
                     # Add the starting direction 
-                    direction_data = { "node": currentNode, "name": edgeName, "direction": self.CONST_START, "vectorAngle": 0, "length": edgeLength }
+                    vectorAngle = math.atan2(currentNodeData['y'], currentNodeData['x'])
+                    direction_data = { "node": currentNode, "name": edgeName, "direction": self.CONST_START, "vectorAngle": vectorAngle, "length": edgeLength }
                     directions.append(direction_data)
                     continue
 

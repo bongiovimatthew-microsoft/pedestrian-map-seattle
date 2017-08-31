@@ -67,7 +67,7 @@ function DisplayDirections(directions){
 
         var row = directionsTable.insertRow(i);
         var cell = row.insertCell(0);
-        cell.innerHTML = current_dir.direction + "<br>" + Math.ceil(current_dir.length) + " units" + "<br>";
+        cell.innerHTML = current_dir.direction + "<br>" + "Go " + Math.ceil(current_dir.length * 3.281) + " feet" + "<br>";
     }
 }
 
