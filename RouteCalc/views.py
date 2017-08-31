@@ -10,6 +10,7 @@ import networkx as nx
 import math
 import sys
 from DataCleaners import DataAggregator
+from RouteCalc import DirectionsManager
 
 GOOGLE_API_KEY = 'AIzaSyDhdh1eXucfnK3EytcFAqTd7rt8-y9N7bw';
 
@@ -102,6 +103,7 @@ def edgeCostFromDataPoint(graph, edge, point):
 
     return 0
 
+
 #
 # Generate a GeoJSON path from a set of nodes in the given graph
 #
@@ -115,6 +117,7 @@ def edgeCostFromDataPoint(graph, edge, point):
 def getGeoJsonFromPath(path, graph):
     node_features = []
     all_coords = []
+
     for pathnode in path:
         for node, data in graph.nodes_iter(data=True):  
             if node == pathnode: 
@@ -320,10 +323,11 @@ def RouteCalcCore(request):
     graph = modifyGraphWithCosts(graph, allData)
 
     path = getLeastCostPath(graph, requestDict['startLatitude'], requestDict['startLongitude'], requestDict['endLatitude'], requestDict['endLongitude']) 
-
     geoJsonPath = getGeoJsonFromPath(path, graph)
-    print(geoJsonPath)
 
+    directionsMan = DirectionsManager.DirectionsManager()
+    directions = directionsMan.getDirectionsForPath(path, graph)
+    print(directions)
     responseDict = {"path": geoJsonPath}
 
     if ("includeData" in requestDict.keys()):
@@ -341,5 +345,6 @@ def RouteCalcCore(request):
         responseDict["allEdges"] = geoJsonAllEdges
 
     responseDict["numberPointsUsed"] = len(allData["features"])
+    responseDict["directions"] = directions
 
     return JsonResponse(responseDict)
