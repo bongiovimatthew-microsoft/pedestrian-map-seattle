@@ -327,7 +327,7 @@ def RouteCalcCore(request):
 
     directionsMan = DirectionsManager.DirectionsManager()
     directions = directionsMan.getDirectionsForPath(path, graph)
-    print(directions)
+
     responseDict = {"path": geoJsonPath}
 
     if ("includeData" in requestDict.keys()):

@@ -4,8 +4,8 @@
 <head>
     <title>CityPulse</title>
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
-    <!-- <link rel="stylesheet" href="baseMapUi.css"> -->
-    <link rel="stylesheet" href="http://seattlecitypulse.com/style/baseMapUi.css">
+    <link rel="stylesheet" href="baseMapUi.css"> 
+    <!--<link rel="stylesheet" href="http://seattlecitypulse.com/style/baseMapUi.css">-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">    
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.39.1/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.39.1/mapbox-gl.css' rel='stylesheet' />
@@ -109,7 +109,9 @@
             <div id="TooMuchDataDiv" style="display: none;">
                 A lot of data was found in the region selected, limiting display to 2500 points
             </div>
-            <div id="directionsPanel"></div>
+            <div id="directionsPanel">
+                <table id="directionsTable"></table>
+            </div>
             <div id="directionsItinerary"></div>
                 <br>
                 <br>

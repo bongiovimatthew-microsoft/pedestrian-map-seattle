@@ -38,6 +38,9 @@ function ClearMap(){
         console.log("Failed to clear map data")
         console.log(err)
     }    
+
+    var directionsTable = document.getElementById('directionsTable');
+    directionsTable.innerHTML = "";
 }
 
 function edgeColor(feature) {
@@ -53,6 +56,18 @@ function edgeColor(feature) {
     } 
     else {
         return "blue"
+    }
+}
+
+function DisplayDirections(directions){
+    var directionsTable = document.getElementById('directionsTable');
+
+    for (i = 0; i < directions.length; i++) {
+        current_dir = directions[i];
+
+        var row = directionsTable.insertRow(i);
+        var cell = row.insertCell(0);
+        cell.innerHTML = current_dir.direction + "<br>" + Math.ceil(current_dir.length) + " units" + "<br>";
     }
 }
 
@@ -193,6 +208,8 @@ function DisplayNewRoute(response){
            document.getElementById('TooMuchDataDiv').style.display = "block";
        }
     }
+
+    DisplayDirections(response.directions);
 
     document.getElementById("loadingWheel").style.visibility='hidden'; 
 }

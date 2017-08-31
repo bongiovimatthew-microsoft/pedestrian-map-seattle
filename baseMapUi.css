@@ -453,3 +453,11 @@ input:checked + .slider:before {
 h5{
   margin-left: 0.5em;
 }
+
+td {
+    border: 2px solid black;
+    padding-left: 15px;
+}
+table{
+    padding-left: 15px;
+}
