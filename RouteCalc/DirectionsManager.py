@@ -4,6 +4,25 @@ import math
 class DirectionsManager():
 
     def __init__(self):
+        
+        #
+        # Directions Constants 
+        #
+
+        self.CONST_LEFT = "left"
+        self.CONST_RIGHT = "right"
+        self.CONST_STRAIGHT = "straight"
+        self.CONST_BACK = "back"
+        self.CONST_CONTINUE = "Continue"
+        self.CONST_ONTO = "onto"
+        self.CONST_SPACE = " "
+        self.CONST_STAYON = "to stay on"
+        self.CONST_START = "Start"
+        self.CONST_STARTON = "Start on"
+        self.CONST_TURN = "Turn"
+        self.CONST_NAMELESS_ROAD = "Small Nameless Road"
+
+        # --------------------------------------
         return
 
     #
@@ -54,13 +73,13 @@ class DirectionsManager():
     #
     def getDirectionStringFromAngle(self, angle):
         if 20 <= angle <= 160:
-            return "Left"
+            return self.CONST_LEFT
         elif -160 <= angle <= -20:
-            return "Right"
+            return self.CONST_RIGHT
         elif -20 <= angle <= 20:
-            return "Straight"
+            return self.CONST_STRAIGHT
         elif (160 <= angle <= 180) or (-180 <= angle <= -160):
-            return "Back"
+            return self.CONST_BACK
 
     #
     # Clean a set of "simple" directions by combining consecutive "straight" directions
@@ -81,14 +100,15 @@ class DirectionsManager():
             if index < len(directions) - 1:
                 nextDirection = directions[index + 1]
 
-                while (nextDirection['direction'] == "Straight" == currentDirection['direction']) and (nextDirection['name'] == currentDirection['name']):
+                while (nextDirection['direction'] == self.CONST_STRAIGHT == currentDirection['direction']) and (nextDirection['name'] == currentDirection['name']):
                     
                     # Replace with a single, combined direction 
-                    direction_data = { "node": [currentDirection['node'], nextDirection['node']], "name": currentDirection['name'], "direction": "Straight", "vectorAngle": 0, "length": nextDirection['length'] + currentDirection['length'] }
+                    direction_data = { "node": [currentDirection['node'], nextDirection['node']], "name": currentDirection['name'], "direction": self.CONST_STRAIGHT, "vectorAngle": 0, "length": nextDirection['length'] + currentDirection['length'] }
                     del directions[index + 1]
                     del directions[index]
                     directions.insert(index, direction_data)
 
+                    # Continue iterating through the next direction, unless we run out of list, then break from the 'while' loop
                     if index < len(directions) - 1:
                         currentDirection = nextDirection 
                         nextDirection = directions[index + 1]
@@ -99,20 +119,27 @@ class DirectionsManager():
         # Next, iterate through all the directions again and update the direction names 
         #        
         for index, currentDirection in enumerate(directions):
+            
+            #
+            # Add the starting direction for the first entry 
+            #
             if index == 0: 
-                full_direction = "Start on " + currentDirection['name']
+                full_direction = self.CONST_STARTON + self.CONST_SPACE + currentDirection['name']
                 currentDirection['direction'] = full_direction
                 continue
 
             previousDirection = directions[index - 1]
-            prefix = "Turn"
-            if currentDirection['direction'] == "Straight":
-                prefix = "Continue"
+            prefix = self.CONST_TURN
+            if currentDirection['direction'] == self.CONST_STRAIGHT:
+                prefix = self.CONST_CONTINUE
 
+            #
+            # If the name's don't match, specify the "onto" text, otherwise, specify the "stay on" text  
+            #    
             if previousDirection['name'].strip().lower() != currentDirection['name'].strip().lower():            
-                full_direction = prefix + " " + currentDirection['direction'] + " onto " + currentDirection['name']
+                full_direction = prefix + self.CONST_SPACE + currentDirection['direction'] + self.CONST_SPACE + self.CONST_ONTO + self.CONST_SPACE + currentDirection['name']
             else: 
-                full_direction = prefix + " " + currentDirection['direction'] + " to stay on " + currentDirection['name']    
+                full_direction = prefix + self.CONST_SPACE + currentDirection['direction'] + self.CONST_SPACE + self.CONST_STAYON + self.CONST_SPACE + currentDirection['name']    
 
             currentDirection['direction'] = full_direction
 
@@ -130,13 +157,19 @@ class DirectionsManager():
     #   EdgeName, EdgeLength corresponding to the edge name and edge length 
     #
     def getEdgeNameAndLength(self, graph, firstNode, secondNode):
-        edgeName = "Small Nameless Road"
+        edgeName = self.CONST_NAMELESS_ROAD
         edgeLength = 0
         edge = graph.get_edge_data(firstNode, secondNode)
         if 'name' in edge[0]: 
             edgeName = edge[0]['name']
         if 'length' in edge[0]:
             edgeLength = edge[0]['length']
+
+        # Some edges have a list of names
+        #  Join them together into a comma-separated string for display to user     
+        if isinstance(edgeName, list):
+            edgeName = ", ".join(edgeName)
+        
         return edgeName, edgeLength 
 
     #
@@ -168,7 +201,7 @@ class DirectionsManager():
                             
                 if index == 0:
                     # Add the starting direction 
-                    direction_data = { "node": currentNode, "name": edgeName, "direction": "Start", "vectorAngle": 0, "length": edgeLength }
+                    direction_data = { "node": currentNode, "name": edgeName, "direction": self.CONST_START, "vectorAngle": 0, "length": edgeLength }
                     directions.append(direction_data)
                     continue
 
@@ -179,7 +212,7 @@ class DirectionsManager():
                     nextEdgeName, nextEdgeLength = self.getEdgeNameAndLength(graph, nextNode, twoNextNode['osmid'])    
                     
                     #
-                    # Generate the vectors between <currentNode, nextNode> and <nextNode, twoNextNode>
+                    # Generate the vectors between (currentNode, nextNode) and (nextNode, twoNextNode)
                     #
                     firstVector = (nextNodeData['x'] - currentNodeData['x'], nextNodeData['y'] - currentNodeData['y'])
                     secondVector = (twoNextNode['x'] - nextNodeData['x'], twoNextNode['y'] - nextNodeData['y'])
