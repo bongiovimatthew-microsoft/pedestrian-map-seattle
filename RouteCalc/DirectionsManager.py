@@ -191,7 +191,9 @@ class DirectionsManager():
 
         for index, pathnode in enumerate(path):
             currentNode, currentNodeData = self.getNodeDataFromId(pathnode, graph)
-            vectorAngle = 0
+            vectorAngle = (180 / math.pi) * math.atan2(currentNodeData['y'], currentNodeData['x'])
+            print("First Vector Angle")
+            print(vectorAngle)
 
             if index < len(path) - 1:
                 nextNode, nextNodeData = self.getNodeDataFromId(path[index + 1], graph)
@@ -200,8 +202,7 @@ class DirectionsManager():
                 edgeName, edgeLength = self.getEdgeNameAndLength(graph, currentNode, nextNode)                
                             
                 if index == 0:
-                    # Add the starting direction 
-                    vectorAngle = math.atan2(currentNodeData['y'], currentNodeData['x'])
+                    # Add the starting direction                     
                     direction_data = { "node": currentNode, "name": edgeName, "direction": self.CONST_START, "vectorAngle": vectorAngle, "length": edgeLength }
                     directions.append(direction_data)
                     continue
@@ -219,6 +220,8 @@ class DirectionsManager():
                     secondVector = (twoNextNode['x'] - nextNodeData['x'], twoNextNode['y'] - nextNodeData['y'])
                     vectorAngle = self.getAngleBetweenVectors(firstVector, secondVector)
 
+                    print("Second Vector Angle")
+                    print(vectorAngle)
                     direction_data = { "node": currentNode, "name": nextEdgeName, "direction": self.getDirectionStringFromAngle(vectorAngle), "vectorAngle": vectorAngle, "length": nextEdgeLength }
                     directions.append(direction_data)
                     continue
