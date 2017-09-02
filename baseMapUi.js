@@ -49,7 +49,7 @@ function ClearMap(){
 
 function edgeColor(feature) {
     total_cost = feature.properties.total_cost;
-    total_cost = 21 - Math.round((total_cost * 10) % 21);
+    total_cost = 20 - Math.round((total_cost * 10) % 21);
     console.log(total_cost)
     return total_cost.toString();
 
