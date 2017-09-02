@@ -10,6 +10,10 @@ var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
 var centerLatToUse = 47.606209
 var centerLongToUse = -122.332071
 var anyKnobsSelected = false;
+// var arrOfColors =  [['green', '#006600'], ['orange', '#FFA500'], ['blue', '#0000FF'], ['red', '#FF0000']]
+
+// var arrOfColors = [['1','#FF0000'], ['2','#FF3200'], ['3','#FF6600'], ['4','#FF9900'], ['5','#FFCC00'], ['6','#FFFF00'], ['7','#CCFF00'], ['8','#99FF00'], ['9','#65FF00'], ['10','#32FF00'], ['11','#00FF00'], ['12','#00FF33'], ['13','#00FF65'], ['14','#00FF99'], ['15','#00FFCB'], ['16','#00FFFF'], ['17','#00CBFF'], ['18','#0099FF'], ['19','#0065FF'], ['20','#0033FF'], ['21','0000FF']]
+var arrOfColors = [['0','#FF0000'], ['1','#FF3200'], ['2','#FF6600'], ['3','#FF9900'], ['4','#FFCC00'], ['5','#FFFF00'], ['6','#CCFF00'], ['7','#99FF00'], ['8','#65FF00'], ['9','#32FF00'], ['10','#00FF00'], ['11','#00FF33'], ['12','#00FF65'], ['13','#00FF99'], ['14','#00FFCB'], ['15','#00FFFF'], ['16','#00CBFF'], ['17','#0099FF'], ['18','#0065FF'], ['19','#0033FF'], ['20','#0000FF']];
 
 function ClearMap(){
     try{
@@ -45,18 +49,22 @@ function ClearMap(){
 
 function edgeColor(feature) {
     total_cost = feature.properties.total_cost;
-    if (total_cost > 1.5) {
-        return "red"
-    } 
-    else if (total_cost > 1.0) {
-        return "orange"
-    } 
-    else if (total_cost > 0.5) {
-        return "green"
-    } 
-    else {
-        return "blue"
-    }
+    total_cost = 21 - Math.round((total_cost * 10) % 21);
+    console.log(total_cost)
+    return total_cost.toString();
+
+    // if (total_cost > 1.5) {
+    //     return "red"
+    // } 
+    // else if (total_cost > 1.0) {
+    //     return "orange"
+    // } 
+    // else if (total_cost > 0.5) {
+    //     return "green"
+    // } 
+    // else {
+    //     return "blue"
+    // }
 }
 
 function DisplayDirections(directions){
@@ -191,7 +199,7 @@ function DisplayNewRoute(response){
                 },
                 'paint': {
                     // 'circle-radius': 8,
-                    'line-color': { property: 'color', type: 'categorical', stops: [['red', '#FF0000'], ['green', '#006600'], ['orange', '#FFA500'], ['blue', '#0000FF'], ['yellow', '#FFFF00']]}
+                    'line-color': { property: 'color', type: 'categorical', stops: arrOfColors}
                 }            
             }); 
         }        

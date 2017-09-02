@@ -141,7 +141,16 @@ def getLeastCostPath(allData, startLat, startLong, endLat, endLong):
 def edgeCostFromDataPoint(graph, edge, point):
     startNode = graph.node[edge[0]] 
     endNode = graph.node[edge[1]]  
-    eps = 0.0001 # About 50 ft (364,000 ft per degree)
+    y0 = point['y']
+    x0 = point['x']
+
+    y1 = startNode['y']
+    x1 = startNode['x']
+
+    y2 = endNode['y']
+    x2 = endNode['x']
+
+    eps = 0.001 # About 50 ft (364,000 ft per degree)
     
     point_to_line_distance = 0
     denom = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (endNode['x'], endNode['y']))
@@ -150,7 +159,9 @@ def edgeCostFromDataPoint(graph, edge, point):
         #  If that's the case, just get the distance between the current point and the edge point
         point_to_line_distance = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (point['x'], point['y']))
     else: 
-        point_to_line_distance = abs( (endNode['x'] - startNode['x']) * (startNode['y'] - point['y']) - (startNode['x'] - point['x']) * (endNode['y'] - startNode['y']) ) / denom
+        point_to_line_distance = abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1) / denom
+
+        # point_to_line_distance = abs( (endNode['x'] - startNode['x']) * (startNode['y'] - point['y']) - (startNode['x'] - point['x']) * (endNode['y'] - startNode['y']) ) / denom
     
     # If the current point lies exactly on the edge, set a minimum distance for division to work 
     if point_to_line_distance == 0:
@@ -221,6 +232,10 @@ def modifyGraphWithCosts(graph, datapoints):
 
         # Scale the distance to be between 0 and 1, and then make it half as important as the scaled cost
         scaled_dist = (edge[3]['length'] / max_dist ) / 2 
+
+        #ISSUE-MANIGU-090117 REMOVE THE NEXT LINE
+        scaled_dist = 0
+
         graph.add_edge(edge[0], edge[1], edge[2], total_cost = scaled_cost + scaled_dist) 
 
     return graph

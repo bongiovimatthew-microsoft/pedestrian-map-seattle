@@ -8,6 +8,7 @@ from DataCleaners import DataAggregator
 from RouteCalc import GraphManager
 from RouteCalc import RequestHandler
 from RouteCalc import JsonCommunicator
+import json
 
 # issue-manigu-06112017 remove csrf exempt
 # todo-manigu-06122017 validate all points are in the request
@@ -49,5 +50,7 @@ def RouteCalcCore(request):
     responseDict["numberPointsUsed"] = len(allData["features"])
     responseDict["directions"] = directionsJson
     responseDict["path"] = routeGeoJson
+
+    print(json.dumps(responseDict))
 
     return JsonResponse(responseDict)
