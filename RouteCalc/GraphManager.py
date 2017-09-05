@@ -2,6 +2,9 @@ import osmnx as ox
 import networkx as nx
 from RouteCalc import JsonCommunicator
 from RouteCalc import DirectionsManager
+import math
+
+EARTHRADIUS = 6371009 # in meters
 
 #
 # Get the Euclidean distance between two poins 
@@ -13,8 +16,14 @@ from RouteCalc import DirectionsManager
 # Returns: 
 #   The Euclidean distance between the points 
 #
-def getDistanceBetweenTwoPoints(point1, point2):
-    return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
+# def getDistanceBetweenTwoPoints(point1, point2):
+#     return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
+
+def getDistanceBetweenTwoPoints(startPointLatLng, endPointLatLng):
+    startPointLatLngRads = (math.radians(startPointLatLng[0]), math.radians(startPointLatLng[1]))
+    endPointLatLngRads = (math.radians(endPointLatLng[0]), math.radians(endPointLatLng[1]))
+    distance = math.acos(math.sin(startPointLatLngRads[0]) * math.sin(endPointLatLngRads[0]) + math.cos(startPointLatLngRads[0]) * math.cos(endPointLatLngRads[0]) * math.cos(endPointLatLngRads[1] - startPointLatLngRads[1])) * EARTHRADIUS
+    return distance
 
 #
 # Generate a graph of the walking path network for a given bounding box
@@ -127,6 +136,97 @@ def getLeastCostPath(allData, startLat, startLong, endLat, endLong):
 
     return nx.shortest_path(graph, startNode, endNode, weight='total_cost'), graph
 
+
+#
+# Get the distance from a point to an edge
+#
+# Parameters: 
+#   graph - a networkx MultiGraph 
+#   edge - a networkx MultiGraph edge between two nodes
+#   point - a datapoint containing three attribues, 'x', 'y', and 'cost'
+#
+# Returns: 
+#   The distance from the point to the given edge
+#
+# def getPointToLineDistance(graph, edge, point):
+#     startNode = graph.node[edge[0]] 
+#     endNode = graph.node[edge[1]]  
+#     y0 = point['y']
+#     x0 = point['x']
+
+#     y1 = startNode['y']
+#     x1 = startNode['x']
+
+#     y2 = endNode['y']
+#     x2 = endNode['x']
+
+    
+#     point_to_line_distance = 0
+#     denom = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (endNode['x'], endNode['y']))
+#     if denom == 0: 
+#         # The current edge starts and ends at the same point
+#         #  If that's the case, just get the distance between the current point and the edge point
+#         point_to_line_distance = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (point['x'], point['y']))
+#     else: 
+#         point_to_line_distance = abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1) / denom
+
+#         # point_to_line_distance = abs( (endNode['x'] - startNode['x']) * (startNode['y'] - point['y']) - (startNode['x'] - point['x']) * (endNode['y'] - startNode['y']) ) / denom
+    
+#     # If the current point lies exactly on the edge, set a minimum distance for division to work 
+#     if point_to_line_distance == 0:
+#         point_to_line_distance = 0.00001
+
+#     return point_to_line_distance
+
+def getPointToLineDistance(graph, edge, point):
+    startNode = graph.node[edge[0]] 
+    endNode = graph.node[edge[1]]  
+
+    y0 = point['y']
+    x0 = point['x']
+
+    y1 = startNode['y']
+    x1 = startNode['x']
+
+    y2 = endNode['y']
+    x2 = endNode['x']
+
+    # Point A
+    startPointLatLng = (startNode['y'], startNode['x'])
+
+    # Point B
+    endPointLatLng = (endNode['y'], endNode['x'])
+
+    # Point C
+    targetPointLatLng = (point['y'], point['x'])
+
+
+    bearingAC = math.radians(ox.utils.get_bearing(startPointLatLng, targetPointLatLng))
+    bearingAB = math.radians(ox.utils.get_bearing(startPointLatLng, endPointLatLng))
+    distAC = getDistanceBetweenTwoPoints(startPointLatLng, targetPointLatLng)
+    # print(bearingAC)
+    # print(bearingAB)
+    print(distAC)
+
+    point_to_line_distance = 0
+    if (abs(bearingAC - bearingAB) > math.pi / 2):
+        point_to_line_distance = distAC
+    else:
+        distToArc = math.asin(math.sin(distAC / EARTHRADIUS) * math.sin(bearingAC - bearingAB)) * EARTHRADIUS
+        
+        distAB = getDistanceBetweenTwoPoints(startPointLatLng, endPointLatLng)
+
+        # D is the projection onto the arc
+        distAD = math.acos(math.cos(distAC / EARTHRADIUS) / math.cos (distToArc / EARTHRADIUS)) * EARTHRADIUS
+
+        if (distAD > distAB):
+            point_to_line_distance = getDistanceBetweenTwoPoints(endPointLatLng, targetPointLatLng)
+        else:
+            point_to_line_distance = abs(distToArc)
+
+
+    return point_to_line_distance
+
 #
 # Generate the cost a given point has on a given edge 
 #
@@ -139,37 +239,14 @@ def getLeastCostPath(allData, startLat, startLong, endLat, endLong):
 #   The cost that should be applied to the given edge based on the given datapoint 
 #
 def edgeCostFromDataPoint(graph, edge, point):
-    startNode = graph.node[edge[0]] 
-    endNode = graph.node[edge[1]]  
-    y0 = point['y']
-    x0 = point['x']
 
-    y1 = startNode['y']
-    x1 = startNode['x']
-
-    y2 = endNode['y']
-    x2 = endNode['x']
-
-    eps = 0.001 # About 50 ft (364,000 ft per degree)
-    
-    point_to_line_distance = 0
-    denom = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (endNode['x'], endNode['y']))
-    if denom == 0: 
-        # The current edge starts and ends at the same point
-        #  If that's the case, just get the distance between the current point and the edge point
-        point_to_line_distance = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (point['x'], point['y']))
-    else: 
-        point_to_line_distance = abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1) / denom
-
-        # point_to_line_distance = abs( (endNode['x'] - startNode['x']) * (startNode['y'] - point['y']) - (startNode['x'] - point['x']) * (endNode['y'] - startNode['y']) ) / denom
-    
-    # If the current point lies exactly on the edge, set a minimum distance for division to work 
-    if point_to_line_distance == 0:
-        point_to_line_distance = 0.00001
+    maxDistanceOfEdgeFromPoint = 50 # in meter
+    point_to_line_distance = getPointToLineDistance(graph, edge, point)
+    print(point_to_line_distance)
 
     # If the current point distance is under our epsilon, apply the cost 
     #  decayed over the square of the distance 
-    if point_to_line_distance < eps: 
+    if point_to_line_distance < maxDistanceOfEdgeFromPoint:
         return point['cost'] #(point['cost'] / (point_to_line_distance ** 2))
 
     return 0
@@ -195,6 +272,7 @@ def modifyGraphWithCosts(graph, datapoints):
     #  the appropriate point weight to the edge cost 
     for edge in graph.edges_iter(data=True, keys=True):
         total_cost = 0
+        count = 0
         
         # Iterate through every datapoint to determine its 
         #  weight on the current edge 
@@ -203,11 +281,14 @@ def modifyGraphWithCosts(graph, datapoints):
             point['x'] = feature['geometry']['coordinates'][0] #long
             point['y'] = feature['geometry']['coordinates'][1] #lat
             point['cost'] = feature['properties']['score']
+            edgeCostFromPoint = edgeCostFromDataPoint(graph, edge, point)
+            if edgeCostFromPoint:
+                count += 1
 
-            total_cost += edgeCostFromDataPoint(graph, edge, point)
-
+            total_cost += edgeCostFromPoint
         # Use the add_edge function to update the current edge with the total_cost attribute    
         graph.add_edge(edge[0], edge[1], edge[2], total_cost = total_cost)
+        graph.add_edge(edge[0], edge[1], edge[2], num_points_used = count) 
 
         if total_cost < min_score: 
             min_score = total_cost 
