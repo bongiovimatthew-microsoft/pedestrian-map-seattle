@@ -146,38 +146,8 @@ def getLeastCostPath(allData, startLat, startLong, endLat, endLong):
 #   point - a datapoint containing three attribues, 'x', 'y', and 'cost'
 #
 # Returns: 
-#   The distance from the point to the given edge
+#   The distance from the point to the given edge in meters
 #
-# def getPointToLineDistance(graph, edge, point):
-#     startNode = graph.node[edge[0]] 
-#     endNode = graph.node[edge[1]]  
-#     y0 = point['y']
-#     x0 = point['x']
-
-#     y1 = startNode['y']
-#     x1 = startNode['x']
-
-#     y2 = endNode['y']
-#     x2 = endNode['x']
-
-    
-#     point_to_line_distance = 0
-#     denom = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (endNode['x'], endNode['y']))
-#     if denom == 0: 
-#         # The current edge starts and ends at the same point
-#         #  If that's the case, just get the distance between the current point and the edge point
-#         point_to_line_distance = getDistanceBetweenTwoPoints((startNode['x'], startNode['y']), (point['x'], point['y']))
-#     else: 
-#         point_to_line_distance = abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1) / denom
-
-#         # point_to_line_distance = abs( (endNode['x'] - startNode['x']) * (startNode['y'] - point['y']) - (startNode['x'] - point['x']) * (endNode['y'] - startNode['y']) ) / denom
-    
-#     # If the current point lies exactly on the edge, set a minimum distance for division to work 
-#     if point_to_line_distance == 0:
-#         point_to_line_distance = 0.00001
-
-#     return point_to_line_distance
-
 def getPointToLineDistance(graph, edge, point):
     startNode = graph.node[edge[0]] 
     endNode = graph.node[edge[1]]  
@@ -204,9 +174,6 @@ def getPointToLineDistance(graph, edge, point):
     bearingAC = math.radians(ox.utils.get_bearing(startPointLatLng, targetPointLatLng))
     bearingAB = math.radians(ox.utils.get_bearing(startPointLatLng, endPointLatLng))
     distAC = getDistanceBetweenTwoPoints(startPointLatLng, targetPointLatLng)
-    # print(bearingAC)
-    # print(bearingAB)
-    print(distAC)
 
     point_to_line_distance = 0
     if (abs(bearingAC - bearingAB) > math.pi / 2):
@@ -242,7 +209,6 @@ def edgeCostFromDataPoint(graph, edge, point):
 
     maxDistanceOfEdgeFromPoint = 50 # in meter
     point_to_line_distance = getPointToLineDistance(graph, edge, point)
-    print(point_to_line_distance)
 
     # If the current point distance is under our epsilon, apply the cost 
     #  decayed over the square of the distance 
