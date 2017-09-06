@@ -9,7 +9,7 @@ descartes==1.1.0
 Django==1.11.2
 django-cors-headers==2.1.0
 Fiona==1.7.8
-GDAL==2.1.4
+GDAL==2.2.1
 geopandas==0.2.1
 gevent==1.2.2
 greenlet==0.4.12
