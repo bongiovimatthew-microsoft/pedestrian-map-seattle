@@ -1,11 +1,11 @@
 var map;
-//var routeCalcUrl = "https://routecalculator.herokuapp.com/routeCalc/";
+var routeCalcUrl = "https://routecalculator.herokuapp.com/routeCalc/";
 var sourceAutocomplete;
 var destAutocomplete;
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYm9uZ2lvdmltYXR0aGV3IiwiYSI6ImNqMzU1NXlpYzAyMmwzMm5ya2tuYjNuMWMifQ.cxVuCXpkeTawreTAcEnNnQ';
 
-var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
+//var routeCalcUrl = "http://127.0.0.1:8000/routeCalc/";
 
 var centerLatToUse = 47.606209
 var centerLongToUse = -122.332071
