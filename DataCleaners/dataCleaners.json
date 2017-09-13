@@ -1,0 +1,53 @@
+{
+	"cleaners": 
+	[
+			{
+				"name": "Seattle911Cleaner",
+				"knob": "Safety",
+				"weight": -1,
+				"boundingBox": {
+					"startLatitude": 0,
+					"startLongitude": 0,
+					"endLatitude": 0,
+					"endLongitude": 0
+				},
+				"effectiveRadius": 50
+			},
+			{
+				"name": "SeattleAccessibilityCleaner",
+				"knob": "Accessibility",
+				"weight": 1,
+				"boundingBox": {
+					"startLatitude": 0,
+					"startLongitude": 0,
+					"endLatitude": 0,
+					"endLongitude": 0
+				},
+				"effectiveRadius": 10
+			},
+			{
+				"name": "SeattleNatureCleaner",
+				"knob": "Nature",
+				"weight": 1,
+				"boundingBox": {
+					"startLatitude": 0,
+					"startLongitude": 0,
+					"endLatitude": 0,
+					"endLongitude": 0
+				},
+				"effectiveRadius": 50
+			},
+			{
+				"name": "SeattlePublicToiletsCleaner",
+				"knob": "Toilets",
+				"weight": 1,
+				"boundingBox": {
+					"startLatitude": 0,
+					"startLongitude": 0,
+					"endLatitude": 0,
+					"endLongitude": 0
+				},
+				"effectiveRadius": 100
+			}
+		]
+}
