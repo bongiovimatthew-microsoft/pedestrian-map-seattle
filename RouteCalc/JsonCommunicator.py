@@ -60,7 +60,7 @@ def getGeoJsonForAllEdges(graph):
                     ]
                 },
                 "properties": {
-                    "total_cost": edge[3]['total_cost'],
+                    "total_cost": edge[3]['raw_cost'],
                     "num_points_used": edge[3]['num_points_used']
                 }
             }

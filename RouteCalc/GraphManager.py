@@ -108,6 +108,7 @@ def getRouteAndDirections(allData, startLat, startLong, endLat, endLong, returnG
     directionsMan = DirectionsManager.DirectionsManager()
     directions = directionsMan.getDirectionsForPath(path, graph)
 
+    # fig, ax = ox.plot_graph(ox.project_graph(graph), node_size=1)
     if returnGraph:
         return route, directions, graph
     
@@ -207,7 +208,7 @@ def getPointToLineDistance(graph, edge, point):
 #
 def edgeCostFromDataPoint(graph, edge, point):
 
-    maxDistanceOfEdgeFromPoint = 50 # in meter
+    maxDistanceOfEdgeFromPoint = 50 # in meters
     point_to_line_distance = getPointToLineDistance(graph, edge, point)
 
     # If the current point distance is under our epsilon, apply the cost 
@@ -277,13 +278,17 @@ def modifyGraphWithCosts(graph, datapoints):
 
         scaled_cost = (scale_val - edge[3]['total_cost']) / scoreToDivideBy
 
+        # Store the cost that depends fully on the cost and not on the distance
+        graph.add_edge(edge[0], edge[1], edge[2], raw_cost = scaled_cost)
+        print(edge[3]['raw_cost'])
+
         # Scale the distance to be between 0 and 1, and then make it half as important as the scaled cost
-        scaled_dist = (edge[3]['length'] / max_dist ) / 2 
+        # scaled_dist = (edge[3]['length'] / max_dist ) / 2 
 
         #ISSUE-MANIGU-090117 REMOVE THE NEXT LINE
-        scaled_dist = 0
+        # scaled_dist = 0
 
-        graph.add_edge(edge[0], edge[1], edge[2], total_cost = scaled_cost + scaled_dist) 
+        graph.add_edge(edge[0], edge[1], edge[2], total_cost = (scaled_cost / (max_dist / edge[3]['length']))) 
 
     return graph
 
