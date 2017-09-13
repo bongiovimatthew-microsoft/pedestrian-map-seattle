@@ -142,6 +142,7 @@ class DataAggregator():
                 point['properties']['score'] = float(point['properties']['score']) * cleaner["weight"]
 
                 point['properties']['knob'] = cleaner["knob"] 
+                point['properties']['effectiveRadius'] = cleaner["effectiveRadius"] 
 
                 # Scale point weight by weight of knob for this call
                 # issue-manigu-06112017 what should we do in the case that we dont have this passed to us?

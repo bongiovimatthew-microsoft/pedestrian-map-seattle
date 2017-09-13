@@ -213,7 +213,7 @@ def edgeCostFromDataPoint(graph, edge, point):
 
     # If the current point distance is under our epsilon, apply the cost 
     #  decayed over the square of the distance 
-    if point_to_line_distance < maxDistanceOfEdgeFromPoint:
+    if point_to_line_distance < (point["effectiveRadius"]):
         return point['cost'] #(point['cost'] / (point_to_line_distance ** 2))
 
     return 0
@@ -248,7 +248,10 @@ def modifyGraphWithCosts(graph, datapoints):
             point['x'] = feature['geometry']['coordinates'][0] #long
             point['y'] = feature['geometry']['coordinates'][1] #lat
             point['cost'] = feature['properties']['score']
+            point['effectiveRadius'] = feature['properties']['effectiveRadius']
             edgeCostFromPoint = edgeCostFromDataPoint(graph, edge, point)
+            
+            # Increment count if it actually applied
             if edgeCostFromPoint:
                 count += 1
 

@@ -23,7 +23,7 @@
 					"endLatitude": 0,
 					"endLongitude": 0
 				},
-				"effectiveRadius": 10
+				"effectiveRadius": 5
 			},
 			{
 				"name": "SeattleNatureCleaner",
