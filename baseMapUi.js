@@ -14,7 +14,37 @@ var anyKnobsSelected = false;
 
 // var arrOfColors = [['1','#FF0000'], ['2','#FF3200'], ['3','#FF6600'], ['4','#FF9900'], ['5','#FFCC00'], ['6','#FFFF00'], ['7','#CCFF00'], ['8','#99FF00'], ['9','#65FF00'], ['10','#32FF00'], ['11','#00FF00'], ['12','#00FF33'], ['13','#00FF65'], ['14','#00FF99'], ['15','#00FFCB'], ['16','#00FFFF'], ['17','#00CBFF'], ['18','#0099FF'], ['19','#0065FF'], ['20','#0033FF'], ['21','0000FF']]
 var arrOfColors = [['0','#FF0000'], ['1','#FF3200'], ['2','#FF6600'], ['3','#FF9900'], ['4','#FFCC00'], ['5','#FFFF00'], ['6','#CCFF00'], ['7','#99FF00'], ['8','#65FF00'], ['9','#32FF00'], ['10','#00FF00'], ['11','#00FF33'], ['12','#00FF65'], ['13','#00FF99'], ['14','#00FFCB'], ['15','#00FFFF'], ['16','#00CBFF'], ['17','#0099FF'], ['18','#0065FF'], ['19','#0033FF'], ['20','#0000FF']];
+// Warn if overriding existing method
+if(Array.prototype.equals)
+    console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
 
+// attach the .equals method to Array's prototype to call it on any array
+Array.prototype.equals = function (array) {
+    // if the other array is a falsy value, return
+    if (!array)
+        return false;
+
+    // compare lengths - can save a lot of time 
+    if (this.length != array.length)
+        return false;
+
+    for (var i = 0, l=this.length; i < l; i++) {
+        // Check if we have nested arrays
+        if (this[i] instanceof Array && array[i] instanceof Array) {
+            // recurse into the nested arrays
+            if (!this[i].equals(array[i]))
+                return false;       
+        }           
+        else if (this[i] != array[i]) { 
+            // Warning - two different object instances will never be equal: {x:20} != {x:20}
+            return false;   
+        }           
+    }       
+    return true;
+}
+
+// Hide method from for-in loops
+Object.defineProperty(Array.prototype, "equals", {enumerable: false});
 function ClearMap(){
     try{
         map.removeSource("route");
@@ -40,6 +70,15 @@ function ClearMap(){
     }
     catch(err){
         console.log("Failed to clear map data")
+        console.log(err)
+    }    
+
+    try{
+        map.removeSource("allEdgeNodes");
+        map.removeLayer("allEdgeNodes");
+    }
+    catch(err){
+        console.log("Failed to clear map edge nodes")
         console.log(err)
     }    
 
@@ -174,6 +213,8 @@ function DisplayNewRoute(response){
         {
             // Build an array of linestrings for each edge
             var edgesLines = [];
+            var edgeNodesJsonArr = [];
+            var edgeNodesDict = {};
             
             // Build a layer for each feature and push it into the empty array
             var i;
@@ -182,8 +223,37 @@ function DisplayNewRoute(response){
                 response.allEdges.features[i].properties['color'] = edgeColor(response.allEdges.features[i])
 
                 edgesLines.push(response.allEdges.features[i]);
+
+                var j;
+                for (j = 0; j < response.allEdges.features[i].geometry.coordinates.length; j++) {
+                    var tempCoordsString = response.allEdges.features[i].geometry.coordinates[j];
+                    var tempCoordsFloat = [parseFloat(tempCoordsString[0]), parseFloat(tempCoordsString[1])];
+                    if (!(tempCoordsFloat[0] in edgeNodesDict)) {
+                        edgeNodesDict[tempCoordsFloat[0]] = new Set([]);
+                    }
+
+                    edgeNodesDict[tempCoordsFloat[0]].add(tempCoordsFloat[1]);
+                }
             }
 
+            for(var edgeNodeLongKey in edgeNodesDict) {
+                edgeNodeLatArr = Array.from(edgeNodesDict[edgeNodeLongKey]);
+                for (var edgeNodeLatIndex in edgeNodeLatArr) {
+                    var tempCoordsFloat = [parseFloat(edgeNodeLongKey), edgeNodeLatArr[edgeNodeLatIndex]];
+                    edgeNodesJsonArr.push({
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': tempCoordsFloat
+                        },
+                        'properties': {
+                            'latitude': tempCoordsFloat[1].toString(),
+                            'longitude': tempCoordsFloat[0].toString()
+                        },
+                        'type': 'Feature'
+                    });                    
+                }
+            }
+ 
             data = {"type": "FeatureCollection", "features": edgesLines}
 
             // add the pushpins data
@@ -200,6 +270,24 @@ function DisplayNewRoute(response){
                 'paint': {
                     // 'circle-radius': 8,
                     'line-color': { property: 'color', type: 'categorical', stops: arrOfColors}
+                }            
+            });
+
+            data = {"type": "FeatureCollection", "features": edgeNodesJsonArr}
+            // add the edge nodes data
+            map.addLayer({
+                'id': 'allEdgeNodes',
+                'type': 'circle',
+                'source': { 
+                    'type': 'geojson', 
+                    'data': data
+                },
+                'layout': {
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'circle-radius': 4,
+                    'circle-color': '#C0C0C0'
                 }            
             }); 
         }        
